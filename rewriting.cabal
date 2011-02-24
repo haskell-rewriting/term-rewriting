@@ -1,0 +1,37 @@
+name:          rewriting
+version:       0.0
+stability:     experimental
+author:        Martin Avanzini,
+               Bertram Felgenhauer,
+               Georg Moser,
+               Andreas Schnabel,
+               Christian Sternagel
+maintainer:    
+license:       LGPL
+license-file:  COPYING.LESSER
+category:      Logic
+synopsis:      Term Rewriting Library
+description:   
+  Yet Another  Term Rewriting Library
+build-type:    Simple
+cabal-version: >= 1.6
+
+library
+    hs-source-dirs:
+        src
+    exposed-modules:
+        Data.Rewriting.Term
+        Data.Rewriting.Term.Type
+        Data.Rewriting.Term.Props
+        Data.Rewriting.Term.Ops 
+        Data.Rewriting.Rule
+        Data.Rewriting.Rule.Type
+        Data.Rewriting.Rule.Props
+        Data.Rewriting.Substitution
+        Data.Rewriting.Substitution.Type
+        Data.Multiset
+    other-modules:
+    build-depends:
+        containers >= 0.4 && < 0.5,
+        base >= 4 && < 5
+    extensions:
