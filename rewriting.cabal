@@ -29,9 +29,9 @@ library
         Data.Rewriting.Rule.Props
         Data.Rewriting.Substitution
         Data.Rewriting.Substitution.Type
-        Data.Multiset
     other-modules:
     build-depends:
         containers >= 0.4 && < 0.5,
+        multiset >= 0.2 && < 0.3,
         base >= 4 && < 5
     extensions:

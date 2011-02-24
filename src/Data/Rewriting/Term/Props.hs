@@ -8,7 +8,7 @@ module Data.Rewriting.Term.Props (
 ) where
 
 import Data.Rewriting.Term.Type
-import Data.Multiset as MS
+import qualified Data.MultiSet as MS
 
 vars :: Term f v -> [v]
 vars = foldTerm (\v -> [v]) (\f as -> concat as)
@@ -28,4 +28,4 @@ isGround :: Term f v -> Bool
 isGround = null . vars
 
 isLinear :: Ord v => Term f v -> Bool
-isLinear = all (\(_, c) -> c == 1) . MS.toList . MS.fromElems . vars
+isLinear = all (\(_, c) -> c == 1) . MS.toOccurList . MS.fromList . vars

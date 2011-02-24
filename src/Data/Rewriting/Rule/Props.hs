@@ -12,7 +12,7 @@ import Data.Rewriting.Rule.Type
 import qualified Data.Rewriting.Term as Term
 
 import qualified Data.Set as S
-import qualified Data.Multiset as MS
+import qualified Data.MultiSet as MS
 
 both :: (Term f v -> Bool) -> Rule f v -> Bool
 both p r = p (lhs r) && p (rhs r)
@@ -52,8 +52,8 @@ isErasing r = not $ varsS (lhs r) `S.isSubsetOf` varsS (rhs r)
 isCreating :: Ord v => Rule f v -> Bool
 isCreating r = not $ varsS (rhs r) `S.isSubsetOf` varsS (lhs r)
 
-varsMS :: Ord v => Term f v -> MS.Multiset v
-varsMS = MS.fromElems . Term.vars
+varsMS :: Ord v => Term f v -> MS.MultiSet v
+varsMS = MS.fromList . Term.vars
 
 isDuplicating :: Ord v => Rule f v -> Bool
 isDuplicating r = not $ varsMS (rhs r) `MS.isSubsetOf` varsMS (lhs r)
