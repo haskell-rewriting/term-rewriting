@@ -29,6 +29,9 @@ library
         Data.Rewriting.Rule.Props
         Data.Rewriting.Substitution
         Data.Rewriting.Substitution.Type
+        Data.Rewriting.Substitution.Ops
+        Data.Rewriting.Substitution.Match
+        Data.Rewriting.Substitution.Unify
     other-modules:
     build-depends:
         containers >= 0.4 && < 0.5,

@@ -1,11 +1,20 @@
 module Data.Rewriting.Substitution.Type (
-    Substitution,
-    Substitution',
+    Subst,
+    GSubst,
+    fromMap,
+    toMap,
 ) where
 
 import Data.Rewriting.Term.Type
 import qualified Data.Map as M
 
-type Substitution f v = M.Map v (Term f v)
+type Subst f v = GSubst v f v
 
-type Substitution' v f v' = M.Map v (Term f v')
+newtype GSubst v f v' = GS { unGS :: M.Map v (Term f v') }
+    deriving Show
+
+fromMap :: M.Map v (Term f v') -> GSubst v f v'
+fromMap = GS
+
+toMap :: GSubst v f v' -> M.Map v (Term f v')
+toMap = unGS
