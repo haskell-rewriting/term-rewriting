@@ -26,7 +26,7 @@ fromString xs input = case Parsec.parse (all $ parseWST xs) "" input of
   Left err -> do { putStr "parse error at "; print err; mzero }
   Right t  -> return t
   where
-    all p = do { x <- p; spaces; eof; return x }
+    all = between spaces (spaces >> eof)
 
 {-| A parser for terms, where @funP@ and @varP@ are parsers for function symbols
 and variables, respectively. The @varP@ parser has a higher priority than the
