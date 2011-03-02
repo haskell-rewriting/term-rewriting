@@ -22,6 +22,7 @@ library
     exposed-modules:
         Data.Rewriting.Term
         Data.Rewriting.Term.Type
+        Data.Rewriting.Term.Parse
         Data.Rewriting.Term.Props
         Data.Rewriting.Term.Ops 
         Data.Rewriting.Rule
@@ -33,5 +34,6 @@ library
     build-depends:
         containers >= 0.4 && < 0.5,
         multiset >= 0.2 && < 0.3,
+        parsec >= 3,
         base >= 4 && < 5
     extensions:
