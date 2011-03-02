@@ -1,7 +1,6 @@
 module Data.Rewriting.Substitution.Type (
     Substitution,
     Substitution',
-    module Data.Rewriting.Term.Type,
 ) where
 
 import Data.Rewriting.Term.Type

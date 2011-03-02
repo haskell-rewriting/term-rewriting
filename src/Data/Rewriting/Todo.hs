@@ -1,20 +1,21 @@
 module Data.Rewriting.Todo where
 
 import Data.Rewriting.Substitution
+import Data.Rewriting.Term.Type as Term
 import qualified Data.Map as M
 import Control.Monad
 
 -- | Apply a substitution, assuming that it's the identity on variables not
 -- mentionend in the substitution.
 apply :: (Ord v) => Substitution f v -> Term f v -> Term f v
-apply subst = foldTerm var fun where
+apply subst = Term.fold var fun where
    var v = M.findWithDefault (Var v) v subst
    fun = Fun
 
 -- | Apply a substitution, assuming that it's total; variables not occurring
 -- in the substitution are replaced by bottom.
 apply' :: (Ord v) => Substitution' v f v' -> Term f v -> Term f v'
-apply' subst = foldTerm var fun where
+apply' subst = Term.fold var fun where
    var v = M.findWithDefault (error "apply': unknown variable") v subst
    fun = Fun
 
