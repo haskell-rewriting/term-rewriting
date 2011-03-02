@@ -14,12 +14,15 @@ import qualified Data.Rewriting.Term as Term
 import qualified Data.Set as S
 import qualified Data.MultiSet as MS
 
+-- | Test whether the given predicate is true for both sides of a rule.
 both :: (Term f v -> Bool) -> Rule f v -> Bool
 both p r = p (lhs r) && p (rhs r)
 
+-- | Apply a function to the lhs of a rule.
 left :: (Term f v -> a) -> Rule f v -> a
 left f = f . lhs
 
+-- | Apply a function to the rhs of a rule.
 right :: (Term f v -> a) -> Rule f v -> a
 right f = f . rhs
 
@@ -64,5 +67,6 @@ isCollapsing = Term.isVar . lhs
 isExpanding :: Rule f v -> Bool
 isExpanding = Term.isVar . rhs
 
+-- | Check whether rule is non-erasing and non-expanding.
 isValid :: Ord v => Rule f v -> Bool
 isValid r = not (isErasing r) && not (isExpanding r)
