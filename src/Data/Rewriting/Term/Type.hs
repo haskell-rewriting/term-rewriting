@@ -1,8 +1,10 @@
 module Data.Rewriting.Term.Type (
     Term (..),
-    foldTerm,
-    mapTerm,
+    fold,
+    map,
 ) where
+
+import Prelude hiding (map)
 
 data Term f v
     = Var v            -- ^ Variable
@@ -11,15 +13,15 @@ data Term f v
 
 -- | Folding terms.
 --
--- >>> foldTerm (\v -> 1) (\f xs -> 1 + sum xs) (Fun 'f' [Var 1, Fun 'g' []])
+-- >>> fold (\v -> 1) (\f xs -> 1 + sum xs) (Fun 'f' [Var 1, Fun 'g' []])
 -- 3 -- size of the given term
-foldTerm :: (v -> a) -> (f -> [a] -> a) -> Term f v -> a
-foldTerm var fun (Var v) = var v
-foldTerm var fun (Fun f ts) = fun f (map (foldTerm var fun) ts)
+fold :: (v -> a) -> (f -> [a] -> a) -> Term f v -> a
+fold var fun (Var v) = var v
+fold var fun (Fun f ts) = fun f (fmap (fold var fun) ts)
 
 -- | Mapping terms: Rename function symbols and variables.
 --
--- >>> mapTerm succ pred (Fun 'f' [Var 2, Fun 'g' []])
+-- >>> map succ pred (Fun 'f' [Var 2, Fun 'g' []])
 -- Fun 'e' [Var 3,Fun 'f' []]
-mapTerm :: (v -> v') -> (f -> f') -> Term f v -> Term f' v'
-mapTerm var fun = foldTerm (Var . var) (Fun . fun)
+map :: (v -> v') -> (f -> f') -> Term f v -> Term f' v'
+map var fun = fold (Var . var) (Fun . fun)

@@ -7,7 +7,7 @@ module Data.Rewriting.Term.Props (
     isLinear,
 ) where
 
-import Data.Rewriting.Term.Type
+import Data.Rewriting.Term.Type as Term
 import qualified Data.MultiSet as MS
 
 -- | Return the list of all variables in the term, from left to right.
@@ -15,14 +15,14 @@ import qualified Data.MultiSet as MS
 -- >>> vars (Fun 'f' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]])
 -- [3,1,2,3]
 vars :: Term f v -> [v]
-vars = foldTerm (\v -> [v]) (\f as -> concat as)
+vars = Term.fold (\v -> [v]) (\f as -> concat as)
 
 -- | Return the list of all function symbols in the term, from left to right.
 --
 -- >>> funs (Fun 'f' [Var 3, Fun 'g' [Fun 'f' []]])
 -- "fgf"
 funs :: Term f v -> [f]
-funs = foldTerm (\v -> []) (\f as -> f : concat as)
+funs = Term.fold (\v -> []) (\f as -> f : concat as)
 
 -- | Return 'True' if the term is a variable, 'False' otherwise.
 isVar :: Term f v -> Bool
