@@ -1,11 +1,12 @@
 {-# OPTIONS_GHC -XFlexibleContexts#-}
 module Data.Rewriting.Term.Parse (
   fromString,
+  ident,
   lex,
   parse,
   parseIO,
-  parseFunWST,
-  parseVarWST,
+  parseFun,
+  parseVar,
   parseWST
 ) where
 
@@ -57,18 +58,22 @@ parse funP varP = term <?> "term"
 
 -- change name?
 parseWST :: Stream s m Char => [String] -> ParsecT s u m (Term String String)
-parseWST xs = parse parseFunWST (parseVarWST xs)
+parseWST xs = parse (parseFun identWST) (parseVar identWST xs)
 
-parseFunWST :: Stream s m Char => ParsecT s u m String
-parseFunWST = lex ident <?> "function symbol"
+parseFun :: Stream s m Char => ParsecT s u m String -> ParsecT s u m String
+parseFun id = lex id <?> "function symbol"
 
-parseVarWST :: Stream s m Char => [String] -> ParsecT s u m String
-parseVarWST xs =
-  do { x <- lex ident; guard (x `elem` xs); return x }
+parseVar :: Stream s m Char =>
+  ParsecT s u m String -> [String] -> ParsecT s u m String
+parseVar id xs =
+  do { x <- lex id; guard (x `elem` xs); return x }
     <?> "variable"
 
-ident :: Stream s m Char => ParsecT s u m String
-ident = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "(),")))
+identWST :: Stream s m Char => ParsecT s u m String
+identWST = ident "(),"
+
+ident :: Stream s m Char => String -> ParsecT s u m String
+ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` tabu)))
 
 -- Same as @p@ but also consume trailing white space.
 lex p = do { x <- p; spaces; return x }
