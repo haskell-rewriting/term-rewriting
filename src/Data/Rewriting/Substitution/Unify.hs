@@ -22,6 +22,7 @@ unify t u = fromMap <$> go [(t, u)] M.empty where
           | f /= f' || length ts /= length ts' -> Nothing
           | otherwise -> go (zip ts ts' ++ xs) subst
    add v t xs subst
+       | Var v == t = go xs subst
        | occurs v t = Nothing
        | otherwise =
            let app = apply (fromMap (M.singleton v t))
