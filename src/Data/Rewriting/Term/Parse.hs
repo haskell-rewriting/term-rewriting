@@ -2,6 +2,7 @@
 module Data.Rewriting.Term.Parse (
   fromString,
   parse,
+  parseIO,
   parseWST
 ) where
 
@@ -12,21 +13,26 @@ import Data.Char
 import Text.Parsec hiding (parse)
 import qualified Text.Parsec as Parsec
 
-{-| @fromString xs s@ parsers a term from the string @s@, where elements of @xs@
-are considered as variables.
+{-| Like @fromString@, but the result is wrapped in the IO monad, making this
+function useful for interactive testing.
 
-> > fromString ["x","y"] "f(x,c)"
+> ghci> fromString ["x","y"] "f(x,c)"
 
 results in
 
 > Fun "f" [Var "x",Fun "c" []]
 -}
-fromString :: [String] -> String -> IO (Term String String)
-fromString xs input = case Parsec.parse (all $ parseWST xs) "" input of
+parseIO :: [String] -> String -> IO (Term String String)
+parseIO xs input = case fromString xs input of
   Left err -> do { putStr "parse error at "; print err; mzero }
   Right t  -> return t
-  where
-    all = between spaces (spaces >> eof)
+
+{-| @fromString xs s@ parsers a term from the string @s@, where elements of @xs@
+are considered as variables. -}
+fromString :: [String] -> String -> Either ParseError (Term String String)
+fromString xs input = Parsec.parse (all $ parseWST xs) "" input
+  where all = between spaces (spaces >> eof)
+
 
 {-| A parser for terms, where @funP@ and @varP@ are parsers for function symbols
 and variables, respectively. The @varP@ parser has a higher priority than the
@@ -44,6 +50,7 @@ parse funP varP = term <?> "term"
     args = between (lex $ char '(') (lex $ char ')') (sepBy term (lex $ char ','))
              <|> return []
 
+
 {-| A parser for terms following the conventions of the ancient ASCII input
 format for the termination competition: every @Char@ that is neither a white
 space (according to @Data.Char.isSpace@) nor one of @'('@, @')'@, or @','@,
@@ -57,6 +64,7 @@ parseWST xs = parse funP varP
     funP  = lex ident
     varP  = do { x <- lex ident; if x `elem` xs then return x else mzero }
     ident = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "(),")))
+
 
 {- Same as @p@ but also consume trailing white space. -}
 lex p = do { x <- p; spaces; return x }
