@@ -34,10 +34,10 @@ fromString :: [String] -> String -> Either ParseError (Term String String)
 fromString xs = runP (parseWST xs) () ""
 
 
--- | A parser for terms, where @funP@ and @varP@ are parsers for function symbols
--- and variables, respectively. The @varP@ parser has a higher priority than the
--- @funP@ parser. Hence, whenever @varP@ succeeds, the token is treated as a
--- variable.
+-- | @parse funP varP@ is a parser for terms, where @funP@ and @varP@ are
+-- parsers for function symbols and variables, respectively. The @varP@ parser
+-- has a higher priority than the @funP@ parser. Hence, whenever @varP@
+-- succeeds, the token is treated as a variable.
 -- 
 -- Note that the user has to take care of handling trailing white space in
 -- @funP@ and @varP@.
@@ -60,9 +60,12 @@ parse funP varP = term <?> "term"
 parseWST :: Stream s m Char => [String] -> ParsecT s u m (Term String String)
 parseWST xs = parse (parseFun identWST) (parseVar identWST xs)
 
+-- | @parseFun ident@ parses function symbols defined by @ident@.
 parseFun :: Stream s m Char => ParsecT s u m String -> ParsecT s u m String
 parseFun id = lex id <?> "function symbol"
 
+-- | @parseVar ident vars@ parses variables as defined by @ident@ and with the
+-- additional requirement that the result is a member of @vars@.
 parseVar :: Stream s m Char =>
   ParsecT s u m String -> [String] -> ParsecT s u m String
 parseVar id xs =
@@ -72,6 +75,8 @@ parseVar id xs =
 identWST :: Stream s m Char => ParsecT s u m String
 identWST = ident "(),"
 
+-- | @ident tabu@ parses a non-empty sequence of non-space characters not
+-- containing elements of @tabu@.
 ident :: Stream s m Char => String -> ParsecT s u m String
 ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` tabu)))
 
