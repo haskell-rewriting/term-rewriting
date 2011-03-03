@@ -20,11 +20,8 @@ import qualified Text.Parsec as Parsec
 {-| Like @fromString@, but the result is wrapped in the IO monad, making this
 function useful for interactive testing.
 
-> ghci> fromString ["x","y"] "f(x,c)"
-
-results in
-
-> Fun "f" [Var "x",Fun "c" []]
+>>> parseIO ["x","y"] "f(x,c)"
+Fun "f" [Var "x",Fun "c" []]
 -}
 parseIO :: [String] -> String -> IO (Term String String)
 parseIO xs input = case fromString xs input of
@@ -69,7 +66,7 @@ parseFunWST = lex ident <?> "function symbol"
 
 parseVarWST :: Stream s m Char => [String] -> ParsecT s u m String
 parseVarWST xs =
-  do { x <- lex ident; if x `elem` xs then return x else mzero }
+  do { x <- lex ident; guard (x `elem` xs); return x }
     <?> "variable"
 
 ident :: Stream s m Char => ParsecT s u m String
