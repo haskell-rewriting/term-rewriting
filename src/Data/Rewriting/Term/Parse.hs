@@ -34,7 +34,7 @@ parseIO xs input = case fromString xs input of
 {-| @fromString xs s@ parsers a term from the string @s@, where elements of @xs@
 are considered as variables. -}
 fromString :: [String] -> String -> Either ParseError (Term String String)
-fromString xs = parseFromString $ parseWST xs
+fromString xs = runP (parseWST xs) () ""
 
 
 {-| A parser for terms, where @funP@ and @varP@ are parsers for function symbols
