@@ -16,11 +16,8 @@ import qualified Text.Parsec as Parsec
 {-| Like @fromString@, but the result is wrapped in the IO monad, making this
 function useful for interactive testing.
 
-> ghci> fromString ["x","y"] "f(x,c)"
-
-results in
-
-> Fun "f" [Var "x",Fun "c" []]
+>>> parseIO ["x","y"] "f(x,c)"
+Fun "f" [Var "x",Fun "c" []]
 -}
 parseIO :: [String] -> String -> IO (Term String String)
 parseIO xs input = case fromString xs input of
