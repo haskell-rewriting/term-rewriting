@@ -1,11 +1,15 @@
 {-# OPTIONS_GHC -XFlexibleContexts#-}
 module Data.Rewriting.Term.Parse (
   fromString,
+  lex,
   parse,
   parseIO,
+  parseFunWST,
+  parseVarWST,
   parseWST
 ) where
 
+import Data.Rewriting.Utils
 import Prelude hiding (lex)
 import Control.Monad
 import Data.Rewriting.Term
@@ -30,8 +34,7 @@ parseIO xs input = case fromString xs input of
 {-| @fromString xs s@ parsers a term from the string @s@, where elements of @xs@
 are considered as variables. -}
 fromString :: [String] -> String -> Either ParseError (Term String String)
-fromString xs input = Parsec.parse (all $ parseWST xs) "" input
-  where all = between spaces (spaces >> eof)
+fromString xs = parseFromString $ parseWST xs
 
 
 {-| A parser for terms, where @funP@ and @varP@ are parsers for function symbols
@@ -59,12 +62,18 @@ it is treated as variable iff it is contained in @xs@.
  -}
 -- change name?
 parseWST :: Stream s m Char => [String] -> ParsecT s u m (Term String String)
-parseWST xs = parse funP varP
-  where
-    funP  = lex ident
-    varP  = do { x <- lex ident; if x `elem` xs then return x else mzero }
-    ident = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "(),")))
+parseWST xs = parse parseFunWST (parseVarWST xs)
 
+parseFunWST :: Stream s m Char => ParsecT s u m String
+parseFunWST = lex ident <?> "function symbol"
+
+parseVarWST :: Stream s m Char => [String] -> ParsecT s u m String
+parseVarWST xs =
+  do { x <- lex ident; if x `elem` xs then return x else mzero }
+    <?> "variable"
+
+ident :: Stream s m Char => ParsecT s u m String
+ident = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "(),")))
 
 {- Same as @p@ but also consume trailing white space. -}
 lex p = do { x <- p; spaces; return x }
