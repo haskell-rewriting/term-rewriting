@@ -59,7 +59,7 @@ parseWST :: Stream s m Char => [String] -> ParsecT s u m (Term String String)
 parseWST xs = parse funP varP
   where
     funP  = lex ident
-    varP  = do { x <- lex ident; if x `elem` xs then return x else mzero }
+    varP  = do { x <- lex ident; guard (x `elem` xs); return x }
     ident = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "(),")))
 
 
