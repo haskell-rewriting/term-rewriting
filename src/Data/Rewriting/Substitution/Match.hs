@@ -10,6 +10,10 @@ import qualified Data.Map as M
 import Control.Monad
 import Control.Applicative
 
+-- | Match two terms. If matching succeeds, return the resulting subtitution.
+-- We have the following property:
+--
+-- > match t u == Just s   ==>   apply s t == gapply s t == u
 match :: (Eq f, Ord v, Eq v') => Term f v -> Term f v' -> Maybe (GSubst v f v')
 match t u = fromMap <$> go t u (M.empty) where
    go (Var v) t subst = case M.lookup v subst of

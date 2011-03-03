@@ -12,6 +12,10 @@ import qualified Data.Map as M
 import Control.Arrow
 import Control.Applicative
 
+-- | Unify two terms. If unification succeeds, return a most general unifier
+-- of the given terms. We have the following property:
+--
+-- > unify t u == Just s   ==>   apply s t == apply s u
 unify :: (Eq f, Ord v) => Term f v -> Term f v -> Maybe (Subst f v)
 unify t u = fromMap <$> go [(t, u)] M.empty where
    go [] subst = Just subst
