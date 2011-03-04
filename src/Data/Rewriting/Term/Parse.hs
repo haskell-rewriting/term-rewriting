@@ -53,8 +53,8 @@ parse :: Stream s m Char => ParsecT s u m f -> ParsecT s u m v
 parse funP varP = term <?> "term"
   where
     term = try (liftM Var varP) <|> liftM2 Fun funP args
-    args = between (lex $ char '(') (lex $ char ')') (sepBy term (lex $ char ','))
-             <|> return []
+    args =  between (lex $ char '(') (lex $ char ')') (sepBy term (lex $ char ','))
+        <|> return []
 
 
 -- | A parser for terms following the conventions of the ancient ASCII input
@@ -167,9 +167,13 @@ termExpr :: Stream s m Char =>
   ParsecT s u m (Term String String)
 termExpr funP varP tab = expr
   where
-    expr = buildExpressionParser tab term <?> "term expression"
-    term = between (lex$char '(') (lex$char ')') expr
-        <|> parse funP varP
+    expr  = buildExpressionParser tab term <?> "term expression"
+    term  = paren expr
+         <|> try (liftM Var varP)
+         <|> liftM2 Fun funP args
+    args  = paren (term `sepBy` lex (char ','))
+         <|> return []
+    paren = between (lex$char '(') (lex$char ')')
 
 
 defaultTable :: Stream s m Char => OperatorTable s u m (Term String String)
