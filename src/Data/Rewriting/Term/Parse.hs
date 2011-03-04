@@ -90,27 +90,62 @@ lex p = do { x <- p; spaces; return x }
 
 
 fixityDecl :: Stream s m Char =>
-  ParsecT s u m Char -> ParsecT s u m (Integer, Operator s u m (Term String String))
-fixityDecl opLetter = binary <|> prefix <|> postfix
+  [String] -> ParsecT s u m (Integer, Operator s u m (Term String String))
+fixityDecl ops = binaryP <|> prefixP <|> postfixP
   where
-    binary  = do
-      lex $ string "infixl"
-      pri <- lex $ many1 digit
-      op  <- lex $ many1 (satisfy (not . isSpace))
-      return (read pri, Infix (do { reservedOp opLetter op; return (\s t -> Fun op [s, t])}) AssocLeft)
-    prefix  = undefined
-    postfix = undefined
+    binaryP  = try $ do
+      assoc <- lex $ (string "infixl" >> return AssocLeft)
+                  <|>(string "infixr" >> return AssocRight)
+                  <|>(string "infix"  >> return AssocNone)
+      pr    <- priority
+      op    <- name
+      return (read pr, binary ops op assoc)
+    prefixP  = try $ do
+      lex $ string "prefix"
+      pr <- priority
+      op <- name
+      return (read pr, prefix ops op)
+    postfixP = try $ do
+      lex $ string "postfix"
+      pr <- priority
+      op <- name
+      return (read pr, postfix ops op)
+    priority = lex $ many1 digit
+    name     = lex $ many1 $ satisfy (not . isSpace)
 
 
-reservedOp opLetter name =
-  lex $ try $ do
-    string name
-    notFollowedBy opLetter <?> ("end of" ++ show name)
+binary :: Stream s m Char =>
+  [String] -> String -> Assoc -> Operator s u m (Term String String)
+binary ops name assoc = Infix (lex $ do
+  reservedOp ops name
+  return (\s t -> Fun name [s, t])) assoc
+
+prefix :: Stream s m Char =>
+  [String] -> String -> Operator s u m (Term String String)
+prefix ops name = Prefix $ lex $ do
+  reservedOp ops name
+  return (\s -> Fun name [s])
+
+
+postfix :: Stream s m Char =>
+  [String] -> String -> Operator s u m (Term String String)
+postfix ops name = Postfix $ lex $ do
+  reservedOp ops name
+  return (\s -> Fun name [s])
+
+
+reservedOp :: Stream s m Char => [String] -> String -> ParsecT s u m ()
+reservedOp ops name = lex $ try $ do
+  string name
+  let suffixes = filter (not . null) $ List.map (drop $ length name) $
+                   filter (name `List.isPrefixOf`) ops
+  notFollowedBy (choice $ List.map (try . string) suffixes) <?> ("end of" ++ show name)
+
 
 operatorTable :: Stream s m Char =>
-  ParsecT s u m Char -> ParsecT s u m (OperatorTable s u m (Term String String))
-operatorTable opLetter = do
-  fds <- fixityDecl opLetter `sepBy` spaces
+  [String] -> ParsecT s u m (OperatorTable s u m (Term String String))
+operatorTable ops = do
+  fds <- fixityDecl ops `sepBy` spaces
   let fds' = reverse $ List.sortBy (\x y -> compare (fst x) (fst y)) fds
   let opTable = List.map (List.map snd) $ List.groupBy (\x y -> fst x == fst y) fds'
   return opTable
@@ -120,16 +155,24 @@ termExpr :: Stream s m Char =>
   ParsecT s u m Char ->
   OperatorTable s u m (Term String String) ->
   ParsecT s u m String -> ParsecT s u m String -> ParsecT s u m (Term String String)
-termExpr opLetter tab funP varP =
-  buildExpressionParser tab (parse funP varP) <?> "term"
+termExpr opLetter tab funP varP = expr
+  where
+    expr = buildExpressionParser tab term <?> "term expression"
+    term = between (lex$char '(') (lex$char ')') expr
+        <|> parse funP varP
 
-exampleTable :: Stream s m Char => OperatorTable s u m (Term String String)
-exampleTable =
-  [[Infix (do { reservedOp (satisfy (const False)) "+"; return (\s t -> Fun "+" [s, t])}) AssocLeft]]
+
+defaultTable :: Stream s m Char => OperatorTable s u m (Term String String)
+defaultTable =
+  [[prefix ops "!"],
+   [binary ops "*" AssocLeft, binary ops "/" AssocLeft],
+   [binary ops "+" AssocLeft, binary ops "-" AssocLeft],
+   [binary ops ":" AssocRight, binary ops "++" AssocRight]]
+    where ops = ["*", "/", "+", "-", ":", "++"]
 
 parseTermExprIO :: [String] -> String -> IO (Term String String)
 parseTermExprIO xs input =
-  case runP (termExpr (satisfy (const False)) exampleTable (parseFun identWST)
+  case runP (termExpr (satisfy (const False)) defaultTable (parseFun identWST)
     (parseVar identWST xs)) () "" input of
       Left e  -> do {putStr "parse error at "; print e; mzero }
       Right t -> return t
