@@ -8,7 +8,11 @@ module Data.Rewriting.Term.Parse (
   parseFun,
   parseVar,
   parseWST,
-  parseTermExprIO
+  parseTermExprIO,
+  operatorTable,
+  termExpr,
+  identWST,
+  defaultTable
 ) where
 
 import Data.Rewriting.Utils
@@ -76,12 +80,12 @@ parseVar id xs =
     <?> "variable"
 
 identWST :: Stream s m Char => ParsecT s u m String
-identWST = ident "(),"
+identWST = ident []
 
 -- | @ident tabu@ parses a non-empty sequence of non-space characters not
 -- containing elements of @tabu@.
 ident :: Stream s m Char => String -> ParsecT s u m String
-ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` tabu)))
+ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "()," ++ tabu)))
 
 -- Same as @p@ but also consume trailing white space.
 lex p = do { x <- p; spaces; return x }
@@ -90,8 +94,8 @@ lex p = do { x <- p; spaces; return x }
 
 
 fixityDecl :: Stream s m Char =>
-  [String] -> ParsecT s u m (Integer, Operator s u m (Term String String))
-fixityDecl ops = binaryP <|> prefixP <|> postfixP
+  ParsecT s [String] m (Integer, Operator s u m (Term String String))
+fixityDecl = binaryP <|> prefixP <|> postfixP
   where
     binaryP  = try $ do
       assoc <- lex $ (string "infixl" >> return AssocLeft)
@@ -99,16 +103,22 @@ fixityDecl ops = binaryP <|> prefixP <|> postfixP
                   <|>(string "infix"  >> return AssocNone)
       pr    <- priority
       op    <- name
+      ops   <- getState
+      setState (op : ops)
       return (read pr, binary ops op assoc)
     prefixP  = try $ do
       lex $ string "prefix"
-      pr <- priority
-      op <- name
+      pr  <- priority
+      op  <- name
+      ops <- getState
+      setState (op : ops)
       return (read pr, prefix ops op)
     postfixP = try $ do
       lex $ string "postfix"
-      pr <- priority
-      op <- name
+      pr  <- priority
+      op  <- name
+      ops <- getState
+      setState (op : ops)
       return (read pr, postfix ops op)
     priority = lex $ many1 digit
     name     = lex $ many1 $ satisfy (not . isSpace)
@@ -143,19 +153,19 @@ reservedOp ops name = lex $ try $ do
 
 
 operatorTable :: Stream s m Char =>
-  [String] -> ParsecT s u m (OperatorTable s u m (Term String String))
-operatorTable ops = do
-  fds <- fixityDecl ops `sepBy` spaces
+  ParsecT s [String] m (OperatorTable s u m (Term String String))
+operatorTable = do
+  fds <- fixityDecl `sepBy` spaces
   let fds' = reverse $ List.sortBy (\x y -> compare (fst x) (fst y)) fds
   let opTable = List.map (List.map snd) $ List.groupBy (\x y -> fst x == fst y) fds'
   return opTable
 
 
 termExpr :: Stream s m Char =>
-  ParsecT s u m Char ->
+  ParsecT s u m String -> ParsecT s u m String ->
   OperatorTable s u m (Term String String) ->
-  ParsecT s u m String -> ParsecT s u m String -> ParsecT s u m (Term String String)
-termExpr opLetter tab funP varP = expr
+  ParsecT s u m (Term String String)
+termExpr funP varP tab = expr
   where
     expr = buildExpressionParser tab term <?> "term expression"
     term = between (lex$char '(') (lex$char ')') expr
@@ -170,9 +180,10 @@ defaultTable =
    [binary ops ":" AssocRight, binary ops "++" AssocRight]]
     where ops = ["*", "/", "+", "-", ":", "++"]
 
+
 parseTermExprIO :: [String] -> String -> IO (Term String String)
 parseTermExprIO xs input =
-  case runP (termExpr (satisfy (const False)) defaultTable (parseFun identWST)
-    (parseVar identWST xs)) () "" input of
+  case runP (termExpr (parseFun identWST) (parseVar identWST xs) defaultTable)
+            () "" input of
       Left e  -> do {putStr "parse error at "; print e; mzero }
       Right t -> return t
