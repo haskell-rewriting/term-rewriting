@@ -7,16 +7,23 @@ module Data.Rewriting.Term.Parse (
   parseIO,
   parseFun,
   parseVar,
-  parseWST
+  parseWST,
+  parseTermExprIO,
+  operatorTable,
+  termExpr,
+  identWST,
+  defaultTable
 ) where
 
 import Data.Rewriting.Utils
-import Prelude hiding (lex)
+import Prelude hiding (lex, map)
 import Control.Monad
 import Data.Rewriting.Term
 import Data.Char
 import Text.Parsec hiding (parse)
 import qualified Text.Parsec as Parsec
+import Text.Parsec.Expr
+import qualified Data.List as List
 
 -- | Like @fromString@, but the result is wrapped in the IO monad, making this
 -- function useful for interactive testing.
@@ -73,12 +80,110 @@ parseVar id xs =
     <?> "variable"
 
 identWST :: Stream s m Char => ParsecT s u m String
-identWST = ident "(),"
+identWST = ident []
 
 -- | @ident tabu@ parses a non-empty sequence of non-space characters not
 -- containing elements of @tabu@.
 ident :: Stream s m Char => String -> ParsecT s u m String
-ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` tabu)))
+ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "()," ++ tabu)))
 
 -- Same as @p@ but also consume trailing white space.
 lex p = do { x <- p; spaces; return x }
+
+
+
+
+fixityDecl :: Stream s m Char =>
+  ParsecT s [String] m (Integer, Operator s u m (Term String String))
+fixityDecl = binaryP <|> prefixP <|> postfixP
+  where
+    binaryP  = try $ do
+      assoc <- lex $ (string "infixl" >> return AssocLeft)
+                  <|>(string "infixr" >> return AssocRight)
+                  <|>(string "infix"  >> return AssocNone)
+      pr    <- priority
+      op    <- name
+      ops   <- getState
+      setState (op : ops)
+      return (read pr, binary ops op assoc)
+    prefixP  = try $ do
+      lex $ string "prefix"
+      pr  <- priority
+      op  <- name
+      ops <- getState
+      setState (op : ops)
+      return (read pr, prefix ops op)
+    postfixP = try $ do
+      lex $ string "postfix"
+      pr  <- priority
+      op  <- name
+      ops <- getState
+      setState (op : ops)
+      return (read pr, postfix ops op)
+    priority = lex $ many1 digit
+    name     = lex $ many1 $ satisfy (not . isSpace)
+
+
+binary :: Stream s m Char =>
+  [String] -> String -> Assoc -> Operator s u m (Term String String)
+binary ops name assoc = Infix (lex $ do
+  reservedOp ops name
+  return (\s t -> Fun name [s, t])) assoc
+
+prefix :: Stream s m Char =>
+  [String] -> String -> Operator s u m (Term String String)
+prefix ops name = Prefix $ lex $ do
+  reservedOp ops name
+  return (\s -> Fun name [s])
+
+
+postfix :: Stream s m Char =>
+  [String] -> String -> Operator s u m (Term String String)
+postfix ops name = Postfix $ lex $ do
+  reservedOp ops name
+  return (\s -> Fun name [s])
+
+
+reservedOp :: Stream s m Char => [String] -> String -> ParsecT s u m ()
+reservedOp ops name = lex $ try $ do
+  string name
+  let suffixes = filter (not . null) $ List.map (drop $ length name) $
+                   filter (name `List.isPrefixOf`) ops
+  notFollowedBy (choice $ List.map (try . string) suffixes) <?> ("end of" ++ show name)
+
+
+operatorTable :: Stream s m Char =>
+  ParsecT s [String] m (OperatorTable s u m (Term String String))
+operatorTable = do
+  fds <- fixityDecl `sepBy` spaces
+  let fds' = reverse $ List.sortBy (\x y -> compare (fst x) (fst y)) fds
+  let opTable = List.map (List.map snd) $ List.groupBy (\x y -> fst x == fst y) fds'
+  return opTable
+
+
+termExpr :: Stream s m Char =>
+  ParsecT s u m String -> ParsecT s u m String ->
+  OperatorTable s u m (Term String String) ->
+  ParsecT s u m (Term String String)
+termExpr funP varP tab = expr
+  where
+    expr = buildExpressionParser tab term <?> "term expression"
+    term = between (lex$char '(') (lex$char ')') expr
+        <|> parse funP varP
+
+
+defaultTable :: Stream s m Char => OperatorTable s u m (Term String String)
+defaultTable =
+  [[prefix ops "!"],
+   [binary ops "*" AssocLeft, binary ops "/" AssocLeft],
+   [binary ops "+" AssocLeft, binary ops "-" AssocLeft],
+   [binary ops ":" AssocRight, binary ops "++" AssocRight]]
+    where ops = ["*", "/", "+", "-", ":", "++"]
+
+
+parseTermExprIO :: [String] -> String -> IO (Term String String)
+parseTermExprIO xs input =
+  case runP (termExpr (parseFun identWST) (parseVar identWST xs) defaultTable)
+            () "" input of
+      Left e  -> do {putStr "parse error at "; print e; mzero }
+      Right t -> return t
