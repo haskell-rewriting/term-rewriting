@@ -7,16 +7,19 @@ module Data.Rewriting.Term.Parse (
   parseIO,
   parseFun,
   parseVar,
-  parseWST
+  parseWST,
+  parseTermExprIO
 ) where
 
 import Data.Rewriting.Utils
-import Prelude hiding (lex)
+import Prelude hiding (lex, map)
 import Control.Monad
 import Data.Rewriting.Term
 import Data.Char
 import Text.Parsec hiding (parse)
 import qualified Text.Parsec as Parsec
+import Text.Parsec.Expr
+import qualified Data.List as List
 
 -- | Like @fromString@, but the result is wrapped in the IO monad, making this
 -- function useful for interactive testing.
@@ -82,3 +85,51 @@ ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` tabu)))
 
 -- Same as @p@ but also consume trailing white space.
 lex p = do { x <- p; spaces; return x }
+
+
+
+
+fixityDecl :: Stream s m Char =>
+  ParsecT s u m Char -> ParsecT s u m (Integer, Operator s u m (Term String String))
+fixityDecl opLetter = binary <|> prefix <|> postfix
+  where
+    binary  = do
+      lex $ string "infixl"
+      pri <- lex $ many1 digit
+      op  <- lex $ many1 (satisfy (not . isSpace))
+      return (read pri, Infix (do { reservedOp opLetter op; return (\s t -> Fun op [s, t])}) AssocLeft)
+    prefix  = undefined
+    postfix = undefined
+
+
+reservedOp opLetter name =
+  lex $ try $ do
+    string name
+    notFollowedBy opLetter <?> ("end of" ++ show name)
+
+operatorTable :: Stream s m Char =>
+  ParsecT s u m Char -> ParsecT s u m (OperatorTable s u m (Term String String))
+operatorTable opLetter = do
+  fds <- fixityDecl opLetter `sepBy` spaces
+  let fds' = reverse $ List.sortBy (\x y -> compare (fst x) (fst y)) fds
+  let opTable = List.map (List.map snd) $ List.groupBy (\x y -> fst x == fst y) fds'
+  return opTable
+
+
+termExpr :: Stream s m Char =>
+  ParsecT s u m Char ->
+  OperatorTable s u m (Term String String) ->
+  ParsecT s u m String -> ParsecT s u m String -> ParsecT s u m (Term String String)
+termExpr opLetter tab funP varP =
+  buildExpressionParser tab (parse funP varP) <?> "term"
+
+exampleTable :: Stream s m Char => OperatorTable s u m (Term String String)
+exampleTable =
+  [[Infix (do { reservedOp (satisfy (const False)) "+"; return (\s t -> Fun "+" [s, t])}) AssocLeft]]
+
+parseTermExprIO :: [String] -> String -> IO (Term String String)
+parseTermExprIO xs input =
+  case runP (termExpr (satisfy (const False)) exampleTable (parseFun identWST)
+    (parseVar identWST xs)) () "" input of
+      Left e  -> do {putStr "parse error at "; print e; mzero }
+      Right t -> return t
