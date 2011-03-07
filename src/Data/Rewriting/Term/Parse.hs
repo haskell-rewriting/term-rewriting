@@ -8,11 +8,6 @@ module Data.Rewriting.Term.Parse (
   parseFun,
   parseVar,
   parseWST,
-  parseTermExprIO,
-  operatorTable,
-  termExpr,
-  identWST,
-  defaultTable
 ) where
 
 import Data.Rewriting.Utils
