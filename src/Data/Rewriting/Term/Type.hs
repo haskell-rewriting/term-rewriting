@@ -25,3 +25,4 @@ fold var fun (Fun f ts) = fun f (fmap (fold var fun) ts)
 -- Fun 'e' [Var 3,Fun 'f' []]
 map :: (v -> v') -> (f -> f') -> Term f v -> Term f' v'
 map var fun = fold (Var . var) (Fun . fun)
+

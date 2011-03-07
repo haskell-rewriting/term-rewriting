@@ -15,14 +15,22 @@ import qualified Data.MultiSet as MS
 -- >>> vars (Fun 'f' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]])
 -- [3,1,2,3]
 vars :: Term f v -> [v]
-vars = Term.fold (\v -> [v]) (\f as -> concat as)
+vars = flip varsDL []
+
+varsDL :: Term f v -> [v] -> [v]
+varsDL (Var v)    vs = v : vs
+varsDL (Fun _ ts) vs = foldr varsDL vs ts
 
 -- | Return the list of all function symbols in the term, from left to right.
 --
 -- >>> funs (Fun 'f' [Var 3, Fun 'g' [Fun 'f' []]])
 -- "fgf"
 funs :: Term f v -> [f]
-funs = Term.fold (\v -> []) (\f as -> f : concat as)
+funs = flip funsDL []
+
+funsDL :: Term f v -> [f] -> [f]
+funsDL (Var v)    fs = fs
+funsDL (Fun f ts) fs = f : foldr funsDL fs ts
 
 -- | Return 'True' if the term is a variable, 'False' otherwise.
 isVar :: Term f v -> Bool
