@@ -17,6 +17,8 @@ build-type:    Simple
 cabal-version: >= 1.6
 
 library
+    build-depends:
+        ansi-wl-pprint
     hs-source-dirs:
         src
     exposed-modules:
