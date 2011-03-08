@@ -26,6 +26,7 @@ library
         Data.Rewriting.Term.Props
         Data.Rewriting.Term.Pretty
         Data.Rewriting.Term.Ops 
+        Data.Rewriting.Pos
         Data.Rewriting.Rule
         Data.Rewriting.Rule.Type
         Data.Rewriting.Rule.Pretty
@@ -37,6 +38,8 @@ library
         Data.Rewriting.Substitution.Pretty
         Data.Rewriting.Substitution.Match
         Data.Rewriting.Substitution.Unify
+        Data.Rewriting.Rules
+        Data.Rewriting.Rules.Rewrite
     other-modules:
         Data.Rewriting.Utils
     build-depends:
@@ -49,3 +52,5 @@ library
         mtl >= 1.1 && < 2.1,
         base >= 4 && < 5
     extensions:
+        TypeSynonymInstances
+        BangPatterns
