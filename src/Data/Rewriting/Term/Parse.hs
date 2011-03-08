@@ -12,6 +12,7 @@ module Data.Rewriting.Term.Parse (
 
 import Prelude hiding (lex)
 import Control.Monad
+import Control.Monad.Error ()
 import Data.Rewriting.Term.Type
 import Data.Char
 import Text.Parsec hiding (parse)
