@@ -24,14 +24,17 @@ library
         Data.Rewriting.Term.Type
         Data.Rewriting.Term.Parse
         Data.Rewriting.Term.Props
+        Data.Rewriting.Term.Pretty
         Data.Rewriting.Term.Ops 
         Data.Rewriting.Rule
         Data.Rewriting.Rule.Type
+        Data.Rewriting.Rule.Pretty
         Data.Rewriting.Rule.Props
         Data.Rewriting.Substitution
         Data.Rewriting.Substitution.Type
         Data.Rewriting.Substitution.Parse
         Data.Rewriting.Substitution.Ops
+        Data.Rewriting.Substitution.Pretty
         Data.Rewriting.Substitution.Match
         Data.Rewriting.Substitution.Unify
     other-modules:
