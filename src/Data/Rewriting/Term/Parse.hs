@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -XFlexibleContexts#-}
 module Data.Rewriting.Term.Parse (
-  fromString,
-  ident,
-  lex,
-  parse,
-  parseIO,
-  parseFun,
-  parseVar,
-  parseWST,
+    fromString,
+    ident,
+    lex,
+    par,
+    parse,
+    parseIO,
+    parseFun,
+    parseVar,
+    parseWST,
 ) where
 
 import Prelude hiding (lex)
@@ -24,8 +25,8 @@ import Text.Parsec hiding (parse)
 -- Fun "f" [Var "x",Fun "c" []]
 parseIO :: [String] -> String -> IO (Term String String)
 parseIO xs input = case fromString xs input of
-  Left err -> do { putStr "parse error at "; print err; mzero }
-  Right t  -> return t
+    Left err -> do { putStr "parse error at "; print err; mzero }
+    Right t  -> return t
 
 -- | @fromString xs s@ parsers a term from the string @s@, where elements of @xs@
 -- are considered as variables.
@@ -33,20 +34,18 @@ fromString :: [String] -> String -> Either ParseError (Term String String)
 fromString xs = runP (parseWST xs) () ""
 
 
--- | @parse funP varP@ is a parser for terms, where @funP@ and @varP@ are
--- parsers for function symbols and variables, respectively. The @varP@ parser
--- has a higher priority than the @funP@ parser. Hence, whenever @varP@
+-- | @parse fun var@ is a parser for terms, where @fun@ and @var@ are
+-- parsers for function symbols and variables, respectively. The @var@ parser
+-- has a higher priority than the @fun@ parser. Hence, whenever @var@
 -- succeeds, the token is treated as a variable.
 -- 
 -- Note that the user has to take care of handling trailing white space in
--- @funP@ and @varP@.
+-- @fun@ and @var@.
 parse :: Stream s m Char => ParsecT s u m f -> ParsecT s u m v
-  -> ParsecT s u m (Term f v)
-parse funP varP = term <?> "term"
-  where
-    term = try (liftM Var varP) <|> liftM2 Fun funP args
-    args =  between (lex $ char '(') (lex $ char ')') (sepBy term (lex $ char ','))
-        <|> return []
+    -> ParsecT s u m (Term f v)
+parse fun var = term <?> "term" where
+    term = try (liftM Var var) <|> liftM2 Fun fun args
+    args =  par (sepBy term (lex $ char ',')) <|> return []
 
 
 -- | @parseWST xs@ is a parser for terms following the conventions of the
@@ -67,10 +66,9 @@ parseFun id = lex id <?> "function symbol"
 -- | @parseVar ident vars@ parses variables as defined by @ident@ and with the
 -- additional requirement that the result is a member of @vars@.
 parseVar :: Stream s m Char =>
-  ParsecT s u m String -> [String] -> ParsecT s u m String
-parseVar id xs =
-  do { x <- lex id; guard (x `elem` xs); return x }
-    <?> "variable"
+    ParsecT s u m String -> [String] -> ParsecT s u m String
+parseVar id xs =  do { x <- lex id; guard (x `elem` xs); return x }
+              <?> "variable"
 
 identWST :: Stream s m Char => ParsecT s u m String
 identWST = ident []
@@ -78,7 +76,11 @@ identWST = ident []
 -- | @ident tabu@ parses a non-empty sequence of non-space characters not
 -- containing elements of @tabu@.
 ident :: Stream s m Char => String -> ParsecT s u m String
-ident tabu = many1 (satisfy (\c -> not (isSpace c) && not (c `elem` "()," ++ tabu)))
+ident tabu = many1 (satisfy (\c -> not (isSpace c) && c `notElem` ("()," ++ tabu)))
 
 -- Same as @p@ but also consume trailing white space.
+lex :: Stream s m Char => ParsecT s u m a -> ParsecT s u m a
 lex p = do { x <- p; spaces; return x }
+
+par :: Stream s m Char => ParsecT s u m a -> ParsecT s u m a
+par = between (lex$char '(') (lex$char ')')

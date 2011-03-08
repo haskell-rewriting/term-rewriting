@@ -1,7 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-
 module Data.Rewriting.Substitution.Pretty (
-   prettySubst
+    prettySubst
 ) where 
 
 import Data.Rewriting.Substitution.Type
@@ -11,12 +10,12 @@ import qualified Data.Map as M
 import Text.PrettyPrint.ANSI.Leijen
 
 prettyGSubst :: (v -> Doc) -> (f -> Doc) -> (v' -> Doc) -> GSubst v f v' -> Doc
-prettyGSubst prettyVarDom  prettyFuns prettyVarImg subst = 
+prettyGSubst var fun var' subst = 
     encloseSep lbrace rbrace comma [ppBinding v t | (v,t) <- M.toList $ toMap subst]
-    where ppBinding v t = prettyVarDom v <> text "/" <> prettyTerm prettyFuns prettyVarImg t
+    where ppBinding v t = var v <> text "/" <> prettyTerm fun var' t
 
 prettySubst :: (f -> Doc) -> (v -> Doc) -> Subst f v -> Doc
-prettySubst prettyFuns prettyVars = prettyGSubst prettyVars prettyFuns prettyVars
+prettySubst fun var = prettyGSubst var fun var
 
 instance (Pretty v, Pretty f, Pretty v') => Pretty (GSubst v f v') where
     pretty = prettyGSubst pretty pretty pretty

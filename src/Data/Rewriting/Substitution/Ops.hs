@@ -15,15 +15,15 @@ import Control.Applicative
 -- mentionend in the substitution.
 apply :: (Ord v) => Subst f v -> Term f v -> Term f v
 apply subst = Term.fold var fun where
-   var v = M.findWithDefault (Var v) v (toMap subst)
-   fun = Fun
+    var v = M.findWithDefault (Var v) v (toMap subst)
+    fun = Fun
 
 -- | Apply a substitution, assuming that it's total. If the term contains
 -- a variable not defined by the substitution, return 'Nothing'.
 gApply :: (Ord v) => GSubst v f v' -> Term f v -> Maybe (Term f v')
 gApply subst = Term.fold var fun where
-   var v = M.lookup v (toMap subst)
-   fun f ts = Fun f <$> sequence ts
+    var v = M.lookup v (toMap subst)
+    fun f ts = Fun f <$> sequence ts
 
 -- | Compose substitutions. We have
 --
