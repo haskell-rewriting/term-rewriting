@@ -5,11 +5,11 @@ module Data.Rewriting.Substitution.Parse (
     parseIO
 ) where
 
+import Data.Rewriting.Utils.Parse (lex, par)
 import Prelude hiding (lex)
 import qualified Data.Map as Map
 import Data.Rewriting.Term.Type
 import Data.Rewriting.Substitution.Type
-import Data.Rewriting.Term.Parse (lex, par)
 import qualified Data.Rewriting.Term.Parse as Term
 import Control.Monad
 import Text.Parsec hiding (parse)

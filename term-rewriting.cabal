@@ -42,6 +42,7 @@ library
         Data.Rewriting.Rules.Rewrite
     other-modules:
         Data.Rewriting.Utils
+        Data.Rewriting.Utils.Parse
     build-depends:
         containers >= 0.4 && < 0.5,
         multiset >= 0.2 && < 0.3,

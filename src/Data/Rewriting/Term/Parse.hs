@@ -2,8 +2,6 @@
 module Data.Rewriting.Term.Parse (
     fromString,
     ident,
-    lex,
-    par,
     parse,
     parseIO,
     parseFun,
@@ -11,6 +9,7 @@ module Data.Rewriting.Term.Parse (
     parseWST,
 ) where
 
+import Data.Rewriting.Utils.Parse (lex, par)
 import Prelude hiding (lex)
 import Control.Monad
 import Control.Monad.Error ()
@@ -77,10 +76,3 @@ identWST = ident []
 -- containing elements of @tabu@.
 ident :: Stream s m Char => String -> ParsecT s u m String
 ident tabu = many1 (satisfy (\c -> not (isSpace c) && c `notElem` ("()," ++ tabu)))
-
--- Same as @p@ but also consume trailing white space.
-lex :: Stream s m Char => ParsecT s u m a -> ParsecT s u m a
-lex p = do { x <- p; spaces; return x }
-
-par :: Stream s m Char => ParsecT s u m a -> ParsecT s u m a
-par = between (lex$char '(') (lex$char ')')
