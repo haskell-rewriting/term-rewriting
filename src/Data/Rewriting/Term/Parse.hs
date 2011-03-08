@@ -48,11 +48,12 @@ parse funP varP = term <?> "term"
         <|> return []
 
 
--- | A parser for terms following the conventions of the ancient ASCII input
--- format for the termination competition: every @Char@ that is neither a white
--- space (according to @Data.Char.isSpace@) nor one of @'('@, @')'@, or @','@,
--- is considered a letter. An identifier is a non-empty sequence of letters and
--- it is treated as variable iff it is contained in @xs@.
+-- | @parseWST xs@ is a parser for terms following the conventions of the
+-- ancient ASCII input format of the termination competition: every @Char@ that
+-- is neither a white space (according to @Data.Char.isSpace@) nor one of @'('@,
+-- @')'@, or @','@, is considered a letter. An identifier is a non-empty
+-- sequence of letters and it is treated as variable iff it is contained in
+-- @xs@.
 
 -- change name?
 parseWST :: Stream s m Char => [String] -> ParsecT s u m (Term String String)
