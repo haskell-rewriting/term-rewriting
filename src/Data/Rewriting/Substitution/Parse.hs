@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -XFlexibleContexts#-}
+{-# LANGUAGE FlexibleContexts#-}
 module Data.Rewriting.Substitution.Parse (
     fromString,
     parse,
