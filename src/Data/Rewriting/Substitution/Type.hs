@@ -1,6 +1,7 @@
 module Data.Rewriting.Substitution.Type (
     Subst,
     GSubst,
+    -- * utilities not reexported from 'Data.Rewriting.Substitution'
     fromMap,
     toMap,
 ) where
