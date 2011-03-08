@@ -32,14 +32,14 @@ type Reduct f v v' = (Term f v, Pos, Rule f v')
 --
 -- Reducts are returned in pre-order: the first is a leftmost, outermost redex.
 fullRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [(Term f v, Pos, Rule f v')]
+    => [Rule f v'] -> Term f v -> [Reduct f v v']
 fullRewrite trs t = headRewrite trs t ++ nested (fullRewrite trs) t
 
 -- | Outer rewriting: Apply rules at outermost redexes.
 --
 -- Reducts are returned in left to right order.
 outerRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [(Term f v, Pos, Rule f v')]
+    => [Rule f v'] -> Term f v -> [Reduct f v v']
 outerRewrite trs t = case headRewrite trs t of
     [] -> nested (outerRewrite trs) t
     rs -> rs
@@ -48,7 +48,7 @@ outerRewrite trs t = case headRewrite trs t of
 --
 -- Reducts are returned in left to right order.
 innerRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [(Term f v, Pos, Rule f v')]
+    => [Rule f v'] -> Term f v -> [Reduct f v v']
 innerRewrite trs t = case nested (innerRewrite trs) t of
     [] -> headRewrite trs t
     rs -> rs
@@ -57,7 +57,7 @@ innerRewrite trs t = case nested (innerRewrite trs) t of
 --
 -- This is useful as a building block for various rewriting strategies.
 headRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [(Term f v, Pos, Rule f v')]
+    => [Rule f v'] -> Term f v -> [Reduct f v v']
 headRewrite trs t = do
     r <- trs
     s <- maybeToList $ match (lhs r) t
