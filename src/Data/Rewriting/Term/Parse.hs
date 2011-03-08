@@ -17,7 +17,7 @@ import Data.Rewriting.Term.Type
 import Data.Char
 import Text.Parsec hiding (parse)
 
--- | Like @fromString@, but the result is wrapped in the IO monad, making this
+-- | Like 'fromString', but the result is wrapped in the IO monad, making this
 -- function useful for interactive testing.
 --
 -- >>> parseIO ["x","y"] "f(x,c)"
@@ -49,8 +49,8 @@ parse fun var = term <?> "term" where
 
 -- | @parseWST xs@ is a parser for terms following the conventions of the
 -- ancient ASCII input format of the termination competition: every @Char@ that
--- is neither a white space (according to @Data.Char.isSpace@) nor one of @'('@,
--- @')'@, or @','@, is considered a letter. An identifier is a non-empty
+-- is neither a white space (according to 'Data.Char.isSpace') nor one of '@(@',
+-- '@)@', or '@,@', is considered a letter. An identifier is a non-empty
 -- sequence of letters and it is treated as variable iff it is contained in
 -- @xs@.
 
