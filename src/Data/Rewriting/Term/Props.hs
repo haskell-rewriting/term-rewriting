@@ -1,6 +1,8 @@
 module Data.Rewriting.Term.Props (
-    vars,
     funs,
+    funsDL,
+    vars,
+    varsDL,
     isVar,
     isFun,
     isGround,
@@ -18,8 +20,7 @@ vars :: Term f v -> [v]
 vars = flip varsDL []
 
 varsDL :: Term f v -> [v] -> [v]
-varsDL (Var v)    vs = v : vs
-varsDL (Fun _ ts) vs = foldr varsDL vs ts
+varsDL = Term.fold (:) (const $ foldr (.) id)
 
 -- | Return the list of all function symbols in the term, from left to right.
 --
@@ -29,8 +30,8 @@ funs :: Term f v -> [f]
 funs = flip funsDL []
 
 funsDL :: Term f v -> [f] -> [f]
-funsDL (Var v)    fs = fs
-funsDL (Fun f ts) fs = f : foldr funsDL fs ts
+funsDL = Term.fold (const id) (foldl (.) . (:))
+
 
 -- | Return 'True' if the term is a variable, 'False' otherwise.
 isVar :: Term f v -> Bool
