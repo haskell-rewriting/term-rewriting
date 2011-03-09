@@ -44,7 +44,7 @@ library
         Data.Rewriting.Utils
         Data.Rewriting.Utils.Parse
     build-depends:
-        containers >= 0.4 && < 0.5,
+        containers >= 0.3 && < 0.5,
         multiset >= 0.2 && < 0.3,
         parsec >= 3 && < 3.2,
         union-find-array >= 0.1 && < 0.2,
