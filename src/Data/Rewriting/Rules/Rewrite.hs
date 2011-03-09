@@ -6,12 +6,13 @@
 -- rhs should also occur on the lhs. Rules violating this constraint
 -- will have no effect.
 module Data.Rewriting.Rules.Rewrite (
-    Reduct,
+    Reduct (..),
+    Strategy,
     fullRewrite,
     outerRewrite,
     innerRewrite,
+    rootRewrite,
     -- * utilities not reexported from 'Data.Rewriting.Rules'
-    headRewrite,
     nested,
     listContexts,
 ) where
@@ -26,21 +27,29 @@ import Data.Maybe
 -- was rewritten at, and the applied rule.
 --
 -- TODO: should this be a proper record?
-type Reduct f v v' = (Term f v, Pos, Rule f v')
+data Reduct f v v' = Reduct {
+     result :: Term f v,
+     pos :: Pos,
+     rule :: Rule f v',
+     subst :: GSubst v' f v
+}
+
+-- | A rewrite strategy.
+type Strategy f v v' = Term f v -> [Reduct f v v']
 
 -- | Full rewriting: Apply rules anywhere in the term.
 --
 -- Reducts are returned in pre-order: the first is a leftmost, outermost redex.
 fullRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [Reduct f v v']
-fullRewrite trs t = headRewrite trs t ++ nested (fullRewrite trs) t
+    => [Rule f v'] -> Strategy f v v'
+fullRewrite trs t = rootRewrite trs t ++ nested (fullRewrite trs) t
 
 -- | Outer rewriting: Apply rules at outermost redexes.
 --
 -- Reducts are returned in left to right order.
 outerRewrite :: (Ord v', Ord v, Eq f)
     => [Rule f v'] -> Term f v -> [Reduct f v v']
-outerRewrite trs t = case headRewrite trs t of
+outerRewrite trs t = case rootRewrite trs t of
     [] -> nested (outerRewrite trs) t
     rs -> rs
 
@@ -48,32 +57,31 @@ outerRewrite trs t = case headRewrite trs t of
 --
 -- Reducts are returned in left to right order.
 innerRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [Reduct f v v']
+    => [Rule f v'] -> Strategy f v v'
 innerRewrite trs t = case nested (innerRewrite trs) t of
-    [] -> headRewrite trs t
+    [] -> rootRewrite trs t
     rs -> rs
 
--- | Head rewriting: Apply rules only at the root of the term.
+-- | Root rewriting: Apply rules only at the root of the term.
 --
--- This is useful as a building block for various rewriting strategies.
-headRewrite :: (Ord v', Ord v, Eq f)
-    => [Rule f v'] -> Term f v -> [Reduct f v v']
-headRewrite trs t = do
+-- This is mainly useful as a building block for various rewriting strategies.
+rootRewrite :: (Ord v', Ord v, Eq f)
+    => [Rule f v'] -> Strategy f v v'
+rootRewrite trs t = do
     r <- trs
     s <- maybeToList $ match (lhs r) t
-    s' <- maybeToList $ gApply s (rhs r)
-    return (s', [], r)
+    t' <- maybeToList $ gApply s (rhs r)
+    return Reduct{ result = t', pos = [], rule = r, subst = s }
 
 -- | Nested rewriting: Apply a rewriting strategy to all arguments of a
 -- function symbol, left to right. For variables, the result will be empty.
 --
 -- This is another building block for rewriting strategies.
-nested :: (Term f v -> [(Term f v, Pos, a)])
-    -> Term f v -> [(Term f v, Pos, a)]
+nested :: Strategy f v v' -> Strategy f v v'
 nested _ (Var _) = []
-nested a (Fun f ts) = do
+nested s (Fun f ts) = do
     (n, cl, t) <- listContexts ts
-    (\(t', p, r) -> (Fun f (cl t'), n : p, r)) `fmap` a t
+    (\r -> r{ result = Fun f (cl (result r)), pos = n : pos r }) `fmap` s t
 
 -- | Return a list of contexts of a list. Each returned element is an element
 -- index (starting from 1), a function that replaces the list element by a
