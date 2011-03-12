@@ -25,30 +25,30 @@ import Data.List
 -- CS: I'm in favor of 0-based indexing
 type Pos = [Int]
 
--- | @p `above` q@ checks whether @p@ is above @q@ (in the tree representation of
+-- | @p \`above\` q@ checks whether @p@ is above @q@ (in the tree representation of
 -- a term). A position @p@ is above a position @q@, whenever @p@ is a prefix of
 -- @q@.
 above :: Pos -> Pos -> Bool
 above = isPrefixOf
 
--- | @p `below` q@ checks whether @p@ is below @q@, that is to say that @q@ is
+-- | @p \`below\` q@ checks whether @p@ is below @q@, that is to say that @q@ is
 -- above @p@.
 below :: Pos -> Pos -> Bool
 below = flip above
 
--- | @p `parallelTo` q@ checks whether @p@ is parallel to @q@, that is to say
+-- | @p \`parallelTo\` q@ checks whether @p@ is parallel to @q@, that is to say
 -- that @p@ and @q@ do not lie on the same path.
 parallelTo :: Pos -> Pos -> Bool
 parallelTo p q = not (null p') && not (null q') where
     (p', q') = dropCommonPrefix p q
 
--- | @p `leftOf` q@ checks whether @p@ is left of @q@. This is only possible if
+-- | @p \`leftOf\` q@ checks whether @p@ is left of @q@. This is only possible if
 -- @p@ and @q@ do not lie on the same path (i.e., are parallel to each other).
 leftOf :: Pos -> Pos -> Bool
 leftOf p q = not (null p') && not (null q') && head p' < head q' where
     (p', q') = dropCommonPrefix p q
 
--- | @p `rightOf` q@ checks whether @p@ is right of @q@.
+-- | @p \`rightOf\` q@ checks whether @p@ is right of @q@.
 rightOf :: Pos -> Pos -> Bool
 rightOf p q = not (null p') && not (null q') && head p' > head q' where
     (p', q') = dropCommonPrefix p q
