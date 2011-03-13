@@ -9,12 +9,11 @@ module Data.Rewriting.Term.Parse (
     parseWST,
 ) where
 
-import Data.Rewriting.Utils.Parse (lex, par)
+import Data.Rewriting.Utils.Parse (lex, par, ident)
 import Prelude hiding (lex)
 import Control.Monad
 import Control.Monad.Error ()
 import Data.Rewriting.Term.Type
-import Data.Char
 import Text.Parsec hiding (parse)
 
 -- | Like 'fromString', but the result is wrapped in the IO monad, making this
@@ -71,8 +70,3 @@ parseVar id xs =  do { x <- lex id; guard (x `elem` xs); return x }
 
 identWST :: Stream s m Char => ParsecT s u m String
 identWST = ident []
-
--- | @ident tabu@ parses a non-empty sequence of non-space characters not
--- containing elements of @tabu@.
-ident :: Stream s m Char => String -> ParsecT s u m String
-ident tabu = many1 (satisfy (\c -> not (isSpace c) && c `notElem` ("()," ++ tabu)))
