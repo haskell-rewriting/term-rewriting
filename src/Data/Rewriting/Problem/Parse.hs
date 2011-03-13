@@ -101,7 +101,7 @@ parse = parseDecls >> eof >> (snd `liftM` getState) where
 
 
 vars :: (Stream s (Either ProblemParseError) Char) => WSTParser s [String]
-vars = do vs <- many (ident [])
+vars = do vs <- many (lex $ ident [])
           setParsedVariables vs
           return vs
                 
