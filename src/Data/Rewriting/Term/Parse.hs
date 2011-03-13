@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts#-}
 module Data.Rewriting.Term.Parse (
     fromString,
-    ident,
     parse,
     parseIO,
     parseFun,
@@ -69,4 +68,4 @@ parseVar id xs =  do { x <- lex id; guard (x `elem` xs); return x }
               <?> "variable"
 
 identWST :: Stream s m Char => ParsecT s u m String
-identWST = ident []
+identWST = ident "()," []

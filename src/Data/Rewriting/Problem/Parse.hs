@@ -94,14 +94,14 @@ parse = parseDecls >> eof >> (snd `liftM` getState) where
               <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
               <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
               <|> decl "COMMENT"   comment    (\ e p -> p {Prob.comment = Just e})
-              <|> (char '(' >> ident [] >>= throwError . UnsupportedDeclaration)
+              <|> (char '(' >> ident "()," [] >>= throwError . UnsupportedDeclaration)
               <?> "declaration block"
   decl name p f = do r <- (try (lex $ string name) >> p) <?> (name ++ " declaration")
                      modifyProblem $ f r
 
 
 vars :: (Stream s (Either ProblemParseError) Char) => WSTParser s [String]
-vars = do vs <- many (lex $ ident [])
+vars = do vs <- many (lex $ ident "()," [])
           setParsedVariables vs
           return vs
                 

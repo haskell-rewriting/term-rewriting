@@ -5,7 +5,7 @@ module Data.Rewriting.Substitution.Parse (
     parseIO
 ) where
 
-import Data.Rewriting.Utils.Parse (lex, par)
+import Data.Rewriting.Utils.Parse (ident, lex, par)
 import Prelude hiding (lex)
 import qualified Data.Map as Map
 import Data.Rewriting.Term.Type
@@ -29,8 +29,8 @@ binding fun var = liftM2 (,) var (slash >> term) <?> "binding" where
 
 fromString :: [String] -> String -> Either ParseError (Subst String String)
 fromString xs = runP (parse fun (var xs)) () "" where
-    var = Term.parseVar (Term.ident "(),{}/")
-    fun = Term.parseFun (Term.ident "(),{}")
+    var = Term.parseVar $ ident "(),{}/" []
+    fun = Term.parseFun $ ident "(),{}"  []
 
 
 parseIO :: [String] -> String -> IO (Subst String String)
