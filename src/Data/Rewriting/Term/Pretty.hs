@@ -5,6 +5,8 @@ module Data.Rewriting.Term.Pretty (
 import Data.Rewriting.Term.Type
 import Text.PrettyPrint.ANSI.Leijen
 
+-- | Given a pretty printer @f@ for function symbols and pretty printer @v@ for variables
+-- @prettyTerm f v@ produces a pretty printer for terms
 
 prettyTerm :: (f -> Doc) -> (v -> Doc) -> Term f v -> Doc
 prettyTerm _         var (Var x) = var x
