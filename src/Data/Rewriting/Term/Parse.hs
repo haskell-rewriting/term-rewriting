@@ -68,4 +68,6 @@ parseVar id xs =  do { x <- lex id; guard (x `elem` xs); return x }
               <?> "variable"
 
 identWST :: Stream s m Char => ParsecT s u m String
+-- COMMENT: according to http://www.lri.fr/~marche/tpdb/format.html '"' and some
+-- reserved strings are also not allowed, but I don't see the point
 identWST = ident "()," []

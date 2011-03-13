@@ -93,6 +93,9 @@ parse = parseDecls >> eof >> (snd `liftM` getState) where
                                                           Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
               <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
               <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
+              -- FIXME: according to http://www.lri.fr/~marche/tpdb/format.html
+              -- every identifier that is not a reserved keyword may start a
+              -- comment (and this is actually used in the TPDB)
               <|> decl "COMMENT"   comment    (\ e p -> p {Prob.comment = Just e})
               <|> (char '(' >> ident "()," [] >>= throwError . UnsupportedDeclaration)
               <?> "declaration block"
