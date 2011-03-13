@@ -18,11 +18,10 @@ lex p = do { x <- p; spaces; return x }
 par :: Stream s m Char => ParsecT s u m a -> ParsecT s u m a
 par = between (lex$char '(') (lex$char ')')
 
--- | @ident tabu@ parses a non-empty sequence of non-space characters not
--- containing elements of @tabu@.
+-- | @ident taboo@ parses a non-empty sequence of non-space characters not
+-- containing elements of @taboo@.
 ident :: Stream s m Char => String -> [String] -> ParsecT s u m String
-ident tabuChars tabuWords = try $ do
-    s <- many1 (satisfy (\c -> not (isSpace c) && c `notElem` tabuChars))
-    guard (s `notElem` tabuWords)
+ident tabooChars tabooWords = try $ do
+    s <- many1 (satisfy (\c -> not (isSpace c) && c `notElem` tabooChars))
+    guard (s `notElem` tabooWords)
     return s
-
