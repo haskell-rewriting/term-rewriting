@@ -6,6 +6,7 @@ module Data.Rewriting.Rule.Props (
     isDuplicating,
     isCollapsing,
     isValid,
+    funsDL
 ) where
 
 import Data.Rewriting.Rule.Type
@@ -46,7 +47,7 @@ isLeftGround = left Term.isGround
 isRightGround :: Rule f v -> Bool
 isRightGround = right Term.isGround
 
-varsS :: Ord v => Term f v -> S.Set v
+varsS :: Ord v => Term f v -> S.Set v -- MA: really, left missing?
 varsS = S.fromList . Term.vars
 
 isErasing :: Ord v => Rule f v -> Bool
@@ -55,7 +56,7 @@ isErasing r = not $ varsS (lhs r) `S.isSubsetOf` varsS (rhs r)
 isCreating :: Ord v => Rule f v -> Bool
 isCreating r = not $ varsS (rhs r) `S.isSubsetOf` varsS (lhs r)
 
-varsMS :: Ord v => Term f v -> MS.MultiSet v
+varsMS :: Ord v => Term f v -> MS.MultiSet v -- MA: really, left missing?
 varsMS = MS.fromList . Term.vars
 
 isDuplicating :: Ord v => Rule f v -> Bool
@@ -68,5 +69,8 @@ isExpanding :: Rule f v -> Bool
 isExpanding = Term.isVar . rhs
 
 -- | Check whether rule is non-erasing and non-expanding.
-isValid :: Ord v => Rule f v -> Bool
+isValid :: Ord v => Rule f v -> Bool -- MA: keep?
 isValid r = not (isErasing r) && not (isExpanding r)
+
+funsDL ::  Rule f v -> [f] -> [f]
+funsDL r = Term.funsDL (lhs r) . Term.funsDL (rhs r)
