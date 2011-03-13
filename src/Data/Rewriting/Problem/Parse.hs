@@ -62,6 +62,7 @@ fromCharStream sourcename input =
   where initialState = ( Nothing, 
                          Prob.Problem { Prob.startTerms = Prob.TermAlgebra , 
                                         Prob.strategy   = Prob.Full , 
+                                        Prob.theory     = [] ,
                                         Prob.rules      = Prob.RulesPair { Prob.strictRules = [], 
                                                                            Prob.weakRules = [] } , 
                                         Prob.variables  = [] , 
@@ -87,26 +88,45 @@ parsedVariables = fst `liftM` getState
 
 parse :: (Stream s (Either ProblemParseError) Char) => WSTParser s (Problem String String)
 parse = parseDecls >> eof >> (snd `liftM` getState) where 
-  parseDecls = many1 (lex $ par parseDecl)
-  parseDecl = decl     "VAR"       vars       (\ e p -> p {Prob.variables = e})
-              <|> decl "RULES"     rules      (\ e p -> p {Prob.rules   = e, 
-                                                          Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
-              <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
-              <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
-              -- FIXME: according to http://www.lri.fr/~marche/tpdb/format.html
-              -- every identifier that is not a reserved keyword may start a
-              -- comment (and this is actually used in the TPDB)
-              <|> decl "COMMENT"   comment    (\ e p -> p {Prob.comment = Just e})
-              <|> (char '(' >> ident "()," [] >>= throwError . UnsupportedDeclaration)
-              <?> "declaration block"
-  decl name p f = do r <- (try (lex $ string name) >> p) <?> (name ++ " declaration")
-                     modifyProblem $ f r
+  parseDecls = many1 parseDecl
+  parseDecl =  decl "VAR"       vars       (\ e p -> p {Prob.variables = e})
+           <|> decl "THEORY"    theory     (\ e p -> p {Prob.theory = e})
+           <|> decl "RULES"     rules      (\ e p -> p {Prob.rules   = e, 
+                                                        Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
+           <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
+           <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
+           -- FIXME: according to http://www.lri.fr/~marche/tpdb/format.html
+           -- every identifier that is not a reserved keyword may start a
+           -- comment (and this is actually used in the TPDB)
+           <|> (par comment >>= modifyProblem . (\ e p -> p {Prob.comment = Just e}) <?> "comment")
+  decl name p f = try (par $ do
+      lex $ string name
+      r <- p
+      modifyProblem $ f r) <?> (name ++ " block")
 
 
 vars :: (Stream s (Either ProblemParseError) Char) => WSTParser s [String]
 vars = do vs <- many (lex $ ident "()," [])
           setParsedVariables vs
           return vs
+
+theory :: (Stream s (Either ProblemParseError) Char) => WSTParser s [Prob.Theory]
+theory = many thdecl where
+    thdecl     = par ((equations >>= return . Prob.Equations)
+              <|>     (idlist    >>= return . Prob.SymbolProperty))
+    equations  = try (do
+        mvs <- parsedVariables
+        case mvs of
+          Nothing -> throwError VariablesBlockMissing
+          Just vs -> do
+              lex $ string "EQUATIONS"
+              many $ equation vs) <?> "EQUATIONS block"
+    equation vs = do
+        l <- Term.parseWST vs
+        lex $ string "=="
+        r <- Term.parseWST vs
+        return $ Rule l r
+    idlist      = many1 $ (lex $ ident "()," [])
                 
 rules :: (Stream s (Either ProblemParseError) Char) => WSTParser s (Prob.RulesPair String String)
 rules = do mvs <- parsedVariables
