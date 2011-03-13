@@ -27,6 +27,10 @@ library
         Data.Rewriting.Term.Pretty
         Data.Rewriting.Term.Ops 
         Data.Rewriting.Pos
+        Data.Rewriting.Problem
+        Data.Rewriting.Problem.Type
+        Data.Rewriting.Problem.Parse
+        Data.Rewriting.Problem.Pretty
         Data.Rewriting.Rule
         Data.Rewriting.Rule.Type
         Data.Rewriting.Rule.Pretty
