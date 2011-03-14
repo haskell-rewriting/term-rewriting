@@ -16,7 +16,7 @@ import Data.Rewriting.Rule (Rule (..))
 import qualified Data.Rewriting.Term as Term
 import qualified Data.Rewriting.Rules as Rules
 
-import Data.List (partition)
+import Data.List (partition, union)
 import Data.Maybe (isJust)
 import Prelude hiding (lex)
 import Control.Monad.Error
@@ -27,7 +27,6 @@ import System.IO (readFile)
 data ProblemParseError = UnknownParseError String 
                        | UnsupportedStrategy String
                        | FileReadError IOError
-                       | VariablesBlockMissing
                        | UnsupportedDeclaration String
                        | SomeParseError ParseError deriving (Show)
 
@@ -59,65 +58,54 @@ fromCharStream sourcename input =
     Right (Left e)  -> Left $ SomeParseError e
     Right (Right p) -> Right p
     Left e          -> Left e
-  where initialState = ( Nothing, 
-                         Prob.Problem { Prob.startTerms = Prob.TermAlgebra , 
-                                        Prob.strategy   = Prob.Full , 
-                                        Prob.theory     = [] ,
-                                        Prob.rules      = Prob.RulesPair { Prob.strictRules = [], 
-                                                                           Prob.weakRules = [] } , 
-                                        Prob.variables  = [] , 
-                                        Prob.symbols    = [] , 
-                                        Prob.comment    = Nothing })
+  where initialState = Prob.Problem { Prob.startTerms = Prob.AllTerms , 
+                                      Prob.strategy   = Prob.Full , 
+                                      Prob.theory     = Nothing ,
+                                      Prob.rules      = Prob.RulesPair { Prob.strictRules = [], 
+                                                                         Prob.weakRules = [] } , 
+                                      Prob.variables  = [] , 
+                                      Prob.symbols    = [] , 
+                                      Prob.comment    = Nothing }
 
 
-
-type ParserState = (Maybe [String], Problem String String)
+type ParserState = Problem String String
 
 type WSTParser s a = ParsecT s ParserState (Either ProblemParseError) a
 
 modifyProblem :: (Problem String String -> Problem String String) -> WSTParser s ()
-modifyProblem f = modifyState f' where
-  f' (vs, problem) = (vs, f problem)
+modifyProblem = modifyState
 
-setParsedVariables :: [String] -> WSTParser s ()
-setParsedVariables vs = modifyState setvs where
-  setvs (_, problem) = (Just vs, problem)
-        
-parsedVariables :: WSTParser s (Maybe [String])
-parsedVariables = fst `liftM` getState
+parsedVariables :: WSTParser s [String]
+parsedVariables = Prob.variables `liftM` getState
 
 parse :: (Stream s (Either ProblemParseError) Char) => WSTParser s (Problem String String)
-parse = parseDecls >> eof >> (snd `liftM` getState) where 
+parse = spaces >> parseDecls >> eof >> getState where 
   parseDecls = many1 parseDecl
-  parseDecl =  decl "VAR"       vars       (\ e p -> p {Prob.variables = e})
-           <|> decl "THEORY"    theory     (\ e p -> p {Prob.theory = e})
-           <|> decl "RULES"     rules      (\ e p -> p {Prob.rules   = e, 
+  parseDecl =  decl "VAR"       vars       (\ e p -> p {Prob.variables = e `union` Prob.variables p})
+           <|> decl "THEORY"    theory     (\ e p -> p {Prob.theory = maybeAppend Prob.theory e p})
+           <|> decl "RULES"     rules      (\ e p -> p {Prob.rules   = e, --FIXME multiple RULES blocks?
                                                         Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
            <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
            <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
-           <|> (par comment >>= modifyProblem . (\ e p -> p {Prob.comment = Just e}) <?> "comment")
+           <|> (par comment >>= modifyProblem . (\ e p -> p {Prob.comment = maybeAppend Prob.comment e p}) <?> "comment")
   decl name p f = try (par $ do
       lex $ string name
       r <- p
       modifyProblem $ f r) <?> (name ++ " block")
-
+  maybeAppend fld e p = Just $ maybe [] id (fld p) ++ e
 
 vars :: (Stream s (Either ProblemParseError) Char) => WSTParser s [String]
 vars = do vs <- many (lex $ ident "()," [])
-          setParsedVariables vs
           return vs
 
-theory :: (Stream s (Either ProblemParseError) Char) => WSTParser s [Prob.Theory]
+theory :: (Stream s (Either ProblemParseError) Char) => WSTParser s [Prob.Theory String String]
 theory = many thdecl where
     thdecl     = par ((equations >>= return . Prob.Equations)
-              <|>     (idlist    >>= return . Prob.SymbolProperty))
+              <|>     (idlist    >>= \ (x:xs) -> return $ Prob.SymbolProperty x xs))
     equations  = try (do
-        mvs <- parsedVariables
-        case mvs of
-          Nothing -> throwError VariablesBlockMissing
-          Just vs -> do
-              lex $ string "EQUATIONS"
-              many $ equation vs) <?> "EQUATIONS block"
+        vs <- parsedVariables
+        lex $ string "EQUATIONS"
+        many $ equation vs) <?> "EQUATIONS block"
     equation vs = do
         l <- Term.parseWST vs
         lex $ string "=="
@@ -126,13 +114,11 @@ theory = many thdecl where
     idlist      = many1 $ (lex $ ident "()," [])
                 
 rules :: (Stream s (Either ProblemParseError) Char) => WSTParser s (Prob.RulesPair String String)
-rules = do mvs <- parsedVariables
-           case mvs of 
-             Nothing -> throwError VariablesBlockMissing
-             Just vs -> do rs <- many $ rule vs
-                           let (s,w) = partition fst rs
-                           return Prob.RulesPair { Prob.strictRules = map snd s , 
-                                                   Prob.weakRules   = map snd w }
+rules = do vs <- parsedVariables
+           rs <- many $ rule vs
+           let (s,w) = partition fst rs
+           return Prob.RulesPair { Prob.strictRules = map snd s , 
+                                   Prob.weakRules   = map snd w }
   where rule vs = do l <- Term.parseWST vs
                      sep <- lex $ (try $ string "->=") <|> string "->"
                      r <- Term.parseWST vs
@@ -146,15 +132,13 @@ strategy = innermost <|> outermost where
 startterms :: (Stream s (Either ProblemParseError) Char) => WSTParser s Prob.StartTerms
 startterms = basic <|> terms where
   basic = string "CONSTRUCTOR-BASED" >> return Prob.BasicTerms
-  terms = string "FULL" >> return Prob.TermAlgebra            
+  terms = string "FULL" >> return Prob.AllTerms            
   
 comment :: (Stream s (Either ProblemParseError) Char) => WSTParser s String
-comment = do pre <- idents
-             par <- optionMaybe (withpars comment)
-             suf <- if isJust par then idents else return ""
-             return $ pre ++ maybe "" id par ++ suf 
-  where idents = many (noneOf "()")
-        withpars p = do _ <- char '('
-                        s <- p
-                        _ <- char ')'
-                        return $ "(" ++ s ++ ")"
+comment = withpars <|> liftM2 (++) idents comment <|> return ""
+  where idents = many1 (noneOf "()")
+        withpars = do _ <- char '('
+                      pre <- comment
+                      _ <- char ')'
+                      suf <- comment
+                      return $ "(" ++ pre ++ ")" ++ suf

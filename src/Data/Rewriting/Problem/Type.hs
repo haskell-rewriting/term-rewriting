@@ -9,7 +9,7 @@ module Data.Rewriting.Problem.Type (
 
 import Data.Rewriting.Rule (Rule (..))
 
-data StartTerms = TermAlgebra 
+data StartTerms = AllTerms
                 | BasicTerms deriving (Eq, Show)
                                       
 data Strategy = Innermost
@@ -20,12 +20,12 @@ data RulesPair f v = RulesPair { strictRules :: [Rule f v]
                                , weakRules   :: [Rule f v] } deriving (Eq, Show)
 
 
-data Theory = SymbolProperty [String]
-            | Equations [Rule String String] deriving (Eq, Show)
+data Theory f v = SymbolProperty String [f]
+                | Equations [Rule f v] deriving (Eq, Show)
 
 data Problem f v = Problem { startTerms :: StartTerms
                            , strategy   :: Strategy
-                           , theory     :: [Theory]
+                           , theory     :: Maybe [Theory f v]
                            , rules      :: RulesPair f v
                            , variables  :: [v]
                            , symbols    :: [f] 
