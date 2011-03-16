@@ -44,6 +44,8 @@ library
         Data.Rewriting.Substitution.Unify
         Data.Rewriting.Rules
         Data.Rewriting.Rules.Rewrite
+        Data.Rewriting.Context.Type
+        Data.Rewriting.Context.Ops
     other-modules:
         Data.Rewriting.Utils
         Data.Rewriting.Utils.Parse
