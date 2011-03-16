@@ -44,6 +44,7 @@ library
         Data.Rewriting.Substitution.Unify
         Data.Rewriting.Rules
         Data.Rewriting.Rules.Rewrite
+        Data.Rewriting.Context
         Data.Rewriting.Context.Type
         Data.Rewriting.Context.Ops
         Data.Rewriting.CriticalPair
