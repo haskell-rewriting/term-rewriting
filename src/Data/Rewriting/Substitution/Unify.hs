@@ -5,8 +5,8 @@ module Data.Rewriting.Substitution.Unify (
 
 import Data.Rewriting.Substitution.Type
 import Data.Rewriting.Substitution.Ops (apply)
+import qualified Data.Rewriting.Term.Ops as Term
 import qualified Data.Rewriting.Term.Type as Term
-import qualified Data.Rewriting.Term.Props as Term
 import Data.Rewriting.Term.Type (Term (..))
 
 import qualified Data.Map as M

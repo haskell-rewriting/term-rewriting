@@ -1,4 +1,4 @@
-module Data.Rewriting.Rule.Props (
+module Data.Rewriting.Rule.Ops (
     isLinear, isLeftLinear, isRightLinear,
     isGround, isLeftGround, isRightGround,
     isErasing,
@@ -47,7 +47,7 @@ isLeftGround = left Term.isGround
 isRightGround :: Rule f v -> Bool
 isRightGround = right Term.isGround
 
-varsS :: Ord v => Term f v -> S.Set v -- MA: really, left missing?
+varsS :: Ord v => Term f v -> S.Set v
 varsS = S.fromList . Term.vars
 
 isErasing :: Ord v => Rule f v -> Bool
@@ -56,7 +56,7 @@ isErasing r = not $ varsS (lhs r) `S.isSubsetOf` varsS (rhs r)
 isCreating :: Ord v => Rule f v -> Bool
 isCreating r = not $ varsS (rhs r) `S.isSubsetOf` varsS (lhs r)
 
-varsMS :: Ord v => Term f v -> MS.MultiSet v -- MA: really, left missing?
+varsMS :: Ord v => Term f v -> MS.MultiSet v
 varsMS = MS.fromList . Term.vars
 
 isDuplicating :: Ord v => Rule f v -> Bool

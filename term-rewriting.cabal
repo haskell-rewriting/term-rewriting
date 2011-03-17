@@ -22,10 +22,9 @@ library
     exposed-modules:
         Data.Rewriting.Term
         Data.Rewriting.Term.Type
-        Data.Rewriting.Term.Parse
-        Data.Rewriting.Term.Props
-        Data.Rewriting.Term.Pretty
         Data.Rewriting.Term.Ops 
+        Data.Rewriting.Term.Parse
+        Data.Rewriting.Term.Pretty
         Data.Rewriting.Pos
         Data.Rewriting.Problem
         Data.Rewriting.Problem.Type
@@ -34,7 +33,7 @@ library
         Data.Rewriting.Rule
         Data.Rewriting.Rule.Type
         Data.Rewriting.Rule.Pretty
-        Data.Rewriting.Rule.Props
+        Data.Rewriting.Rule.Ops
         Data.Rewriting.Substitution
         Data.Rewriting.Substitution.Type
         Data.Rewriting.Substitution.Parse
