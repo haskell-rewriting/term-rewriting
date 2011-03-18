@@ -14,6 +14,7 @@ module Data.Rewriting.Rule.Ops (
     isCreating,
     isDuplicating,
     isCollapsing,
+    isExpanding, 
     isValid,
 ) where
 
