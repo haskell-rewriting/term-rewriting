@@ -1,6 +1,6 @@
 module Data.Rewriting.Rule.Ops (
     -- * Operations on Rules
-    funs,                            
+    funs,
     funsDL,
     vars,
     varsDL,
@@ -14,6 +14,7 @@ module Data.Rewriting.Rule.Ops (
     isCreating,
     isDuplicating,
     isCollapsing,
+    isExpanding,
     isValid,
 ) where
 
@@ -59,47 +60,71 @@ vars = flip varsDL []
 varsDL :: Rule f v -> [v] -> [v]
 varsDL r = Term.varsDL (lhs r) . Term.varsDL (rhs r)
 
-
+-- | Check whether both sides of the given rule are linear.
 isLinear :: Ord v => Rule f v -> Bool
 isLinear = both Term.isLinear
 
+-- | Check whether the left hand side of the given rule is linear.
 isLeftLinear :: Ord v => Rule f v -> Bool
 isLeftLinear = left Term.isLinear
 
+-- | Check whether the right hand side of the given rule is linear.
 isRightLinear :: Ord v => Rule f v -> Bool
 isRightLinear = right Term.isLinear
 
+-- | Check whether both sides of the given rule is are ground terms.
 isGround :: Rule f v -> Bool
 isGround = both Term.isGround
 
+-- | Check whether the left hand side of the given rule is a ground term.
 isLeftGround :: Rule f v -> Bool
 isLeftGround = left Term.isGround
 
+-- | Check whether the right hand side of the given rule is a ground term.
 isRightGround :: Rule f v -> Bool
 isRightGround = right Term.isGround
 
+-- auxiliary: return variables of term as Set
 varsS :: Ord v => Term f v -> S.Set v
 varsS = S.fromList . Term.vars
 
+-- | Check whether the given rule is erasing, i.e., if some variable
+-- occurs in the left hand side but not in the right hand side.
 isErasing :: Ord v => Rule f v -> Bool
 isErasing r = not $ varsS (lhs r) `S.isSubsetOf` varsS (rhs r)
 
+-- | Check whether the given rule is creating, i.e., if some variable
+-- occurs in its right hand side that does not occur in its left hand side.
+--
+-- This is the dual of 'isErasing'. The term /creating/ is non-standard.
+-- Creating rules are usually forbidden. See also 'isValid'.
 isCreating :: Ord v => Rule f v -> Bool
 isCreating r = not $ varsS (rhs r) `S.isSubsetOf` varsS (lhs r)
 
+-- auxiliary: return variables of term as MultiSet
 varsMS :: Ord v => Term f v -> MS.MultiSet v
 varsMS = MS.fromList . Term.vars
 
+-- | Check whether the given rule is duplicating, i.e., if some variable
+-- occurs more often in its right hand side than in its left hand side.
 isDuplicating :: Ord v => Rule f v -> Bool
 isDuplicating r = not $ varsMS (rhs r) `MS.isSubsetOf` varsMS (lhs r)
 
+-- | Check whether the given rule is collapsing, i.e., if its right
+-- hand side is a variable.
 isCollapsing :: Rule f v -> Bool
-isCollapsing = Term.isVar . lhs
+isCollapsing = Term.isVar . rhs
 
+-- | Check whether the given rule is expanding, i.e., if its left hand
+-- sides is a variable.
+--
+-- This is the dual of 'isCollapsing'. The term /expanding/ is non-standard.
+-- Expanding rules are usually forbidden. See also 'isValid'.
 isExpanding :: Rule f v -> Bool
-isExpanding = Term.isVar . rhs
+isExpanding = Term.isVar . lhs
 
--- | Check whether rule is non-erasing and non-expanding.
+-- | Check whether rule is non-creating and non-expanding.
+-- See also 'isCreating' and 'isExpanding'
 isValid :: Ord v => Rule f v -> Bool
-isValid r = not (isErasing r) && not (isExpanding r)
+isValid r = not (isCreating r) && not (isExpanding r)
 
