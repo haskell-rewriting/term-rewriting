@@ -1,11 +1,11 @@
 module Data.Rewriting.Rules.Ops (
     -- * Operations on Rules
-    funs,                            
+    funs,
     funsDL,
     vars,
     varsDL,
-    lhss, 
-    rhss, 
+    lhss,
+    rhss,
     -- * Predicates on Rules
     isLinear, isLeftLinear, isRightLinear,
     isGround, isLeftGround, isRightGround,
@@ -94,4 +94,4 @@ isExpanding = any Rule.isExpanding
 
 -- | Returns 'True' iff all rules satisfy 'Rule.isValid'
 isValid :: [Rule f v] -> Bool
-isValid = all Rule.isExpanding
+isValid = all Rule.isValid
