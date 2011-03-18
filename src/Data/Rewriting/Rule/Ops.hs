@@ -127,4 +127,3 @@ isExpanding = Term.isVar . lhs
 -- See also 'isCreating' and 'isExpanding'
 isValid :: Ord v => Rule f v -> Bool
 isValid r = not (isCreating r) && not (isExpanding r)
-

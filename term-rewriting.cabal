@@ -43,6 +43,7 @@ library
         Data.Rewriting.Substitution.Unify
         Data.Rewriting.Rules
         Data.Rewriting.Rules.Rewrite
+        Data.Rewriting.Rules.Ops
         Data.Rewriting.Context
         Data.Rewriting.Context.Type
         Data.Rewriting.Context.Ops
