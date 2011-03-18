@@ -5,7 +5,7 @@ module Data.Rewriting.Term.Ops (
     vars,
     varsDL,
     withArity,
-    -- * Predicates on Term
+    -- * Predicates on Terms
     isVar,
     isFun,
     isGround,
@@ -28,10 +28,13 @@ withArity = Term.fold Var (\f ts -> Fun (f, length ts) ts)
 
 -- | Return the list of all variables in the term, from left to right.
 --
--- >>> vars (Fun 'f' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]])
+-- >>> vars (Fun 'g' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]])
 -- [3,1,2,3]
 vars :: Term f v -> [v]
 vars = flip varsDL []
+
+-- | Difference List version of 'vars'.
+-- We have @varsDL t vs = vars t ++ vs@.
 
 varsDL :: Term f v -> [v] -> [v]
 varsDL = Term.fold (:) (const $ foldr (.) id)
@@ -42,6 +45,9 @@ varsDL = Term.fold (:) (const $ foldr (.) id)
 -- "fgf"
 funs :: Term f v -> [f]
 funs = flip funsDL []
+
+-- | Difference List version of 'funs'.
+-- We have @funsDL t vs = funs t ++ vs@.
 
 funsDL :: Term f v -> [f] -> [f]
 funsDL = Term.fold (const id) (foldl (.) . (:))
