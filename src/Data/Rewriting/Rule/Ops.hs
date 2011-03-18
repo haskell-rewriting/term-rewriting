@@ -1,4 +1,13 @@
 module Data.Rewriting.Rule.Ops (
+    -- * Operations on Rules
+    funs,                            
+    funsDL,
+    vars,
+    varsDL,
+    left,
+    right,
+    -- * Predicates on Rules
+    both,
     isLinear, isLeftLinear, isRightLinear,
     isGround, isLeftGround, isRightGround,
     isErasing,
@@ -6,7 +15,6 @@ module Data.Rewriting.Rule.Ops (
     isDuplicating,
     isCollapsing,
     isValid,
-    funsDL
 ) where
 
 import Data.Rewriting.Rule.Type
@@ -27,7 +35,30 @@ left f = f . lhs
 right :: (Term f v -> a) -> Rule f v -> a
 right f = f . rhs
 
--- hmm, many similar variants. is this justified for rules and TRSs?
+-- | Lifting of 'Term.funs' to 'Rule': returns the list of function symbols in left- and right-hand sides.
+--
+-- >>> funs $ Rule {lhs = Fun 'f' [Var 3, Fun 'g' [Fun 'f' []]], rhs = Fun 'h' [Fun 'f' []]}
+-- "fgfhf"
+funs :: Rule f v -> [f]
+funs = flip funsDL []
+
+-- | Difference List version of 'funs'.
+-- We have @funsDL r vs = funs r ++ vs@.
+funsDL ::  Rule f v -> [f] -> [f]
+funsDL r = Term.funsDL (lhs r) . Term.funsDL (rhs r)
+
+-- | Lifting of 'Term.vars' to 'Rule': returns the list of variables in left- and right-hand sides.
+--
+-- >>> vars $ Rule {lhs = Fun 'g' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]], rhs = Fun 'g' [Var 4, Var 3]}
+-- [3,1,2,3,4,3]
+vars :: Rule f v -> [v]
+vars = flip varsDL []
+
+-- | Difference List version of 'vars'.
+-- We have @varsDL r vs = vars r ++ vs@.
+varsDL :: Rule f v -> [v] -> [v]
+varsDL r = Term.varsDL (lhs r) . Term.varsDL (rhs r)
+
 
 isLinear :: Ord v => Rule f v -> Bool
 isLinear = both Term.isLinear
@@ -69,8 +100,6 @@ isExpanding :: Rule f v -> Bool
 isExpanding = Term.isVar . rhs
 
 -- | Check whether rule is non-erasing and non-expanding.
-isValid :: Ord v => Rule f v -> Bool -- MA: keep?
+isValid :: Ord v => Rule f v -> Bool
 isValid r = not (isErasing r) && not (isExpanding r)
 
-funsDL ::  Rule f v -> [f] -> [f]
-funsDL r = Term.funsDL (lhs r) . Term.funsDL (rhs r)
