@@ -43,6 +43,12 @@ library
         Data.Rewriting.Substitution.Unify
         Data.Rewriting.Rules
         Data.Rewriting.Rules.Rewrite
+        Data.Rewriting.Context
+        Data.Rewriting.Context.Type
+        Data.Rewriting.Context.Ops
+        Data.Rewriting.CriticalPair
+        Data.Rewriting.CriticalPair.Type
+        Data.Rewriting.CriticalPair.Ops
     other-modules:
         Data.Rewriting.Utils
         Data.Rewriting.Utils.Parse

@@ -8,7 +8,6 @@ module Data.Rewriting.Pos (
     parallelTo,
     leftOf,
     rightOf,
-    compareHorizontally,
 ) where
 
 import Data.Rewriting.Utils
@@ -52,15 +51,6 @@ leftOf p q = not (null p') && not (null q') && head p' < head q' where
 rightOf :: Pos -> Pos -> Bool
 rightOf p q = not (null p') && not (null q') && head p' > head q' where
     (p', q') = dropCommonPrefix p q
-
--- | @compareHorizontally p q@ imposes a total order on positions. If @p@ is
--- left of @q@, the result is 'LT'; if @p@ is right of @q@, the result is 'GT';
--- in all other cases, the result is 'EQ'.
-compareHorizontally :: Pos -> Pos -> Ordering
-compareHorizontally p q = if not (null p') && not (null q')
-    then if head p' < head q' then LT else GT
-    else EQ where
-        (p', q') = dropCommonPrefix p q
 
 -- reference implementations
 parallelToRef :: Pos -> Pos -> Bool
