@@ -93,5 +93,5 @@ isExpanding :: [Rule f v] -> Bool
 isExpanding = any Rule.isExpanding
 
 -- | Returns 'True' iff all rules satisfy 'Rule.isValid'
-isValid :: [Rule f v] -> Bool
+isValid :: Ord v => [Rule f v] -> Bool
 isValid = all Rule.isValid
