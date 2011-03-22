@@ -22,11 +22,11 @@ import qualified Data.Rewriting.Term as Term
 import qualified Data.Rewriting.Rule as Rule
 
 
--- | @lhss rs@ returns the list of left hand sides of @rs@
+-- | @lhss rs@ returns the list of left-hand sides of @rs@
 lhss :: [Rule f v] -> [Term f v]
 lhss = map Rule.lhs
 
--- | @lhss rs@ returns the list of right hand sides of @rs@
+-- | @lhss rs@ returns the list of right-hand sides of @rs@
 rhss :: [Rule f v] -> [Term f v]
 rhss = map Rule.rhs
 
@@ -39,7 +39,7 @@ funs = flip funsDL []
 funsDL :: [Rule f v] -> [f] -> [f]
 funsDL rs fs = foldr Rule.funsDL fs rs
 
--- | Lifting of 'Term.vars' to list of rules.
+-- | Lifting of Term.'Term.vars' to list of rules.
 vars :: [Rule f v] -> [v]
 vars = flip varsDL []
 
