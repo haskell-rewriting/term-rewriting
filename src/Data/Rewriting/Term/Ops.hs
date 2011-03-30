@@ -50,7 +50,7 @@ funs = flip funsDL []
 -- We have @funsDL t vs = funs t ++ vs@.
 
 funsDL :: Term f v -> [f] -> [f]
-funsDL = Term.fold (const id) (\f fs -> (f:) . foldr (.) id fs)
+funsDL = Term.fold (const id) (\f xs -> (f:) . foldr (.) id xs)
 
 -- | Return 'True' if the term is a variable, 'False' otherwise.
 isVar :: Term f v -> Bool
