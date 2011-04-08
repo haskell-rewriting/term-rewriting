@@ -6,6 +6,7 @@ module Data.Rewriting.Rules.Ops (
     varsDL,
     lhss,
     rhss,
+    restrictFuns,
     -- * Predicates on Rules
     isLinear, isLeftLinear, isRightLinear,
     isGround, isLeftGround, isRightGround,
@@ -95,3 +96,8 @@ isExpanding = any Rule.isExpanding
 -- | Returns 'True' iff all rules satisfy 'Rule.isValid'
 isValid :: Ord v => [Rule f v] -> Bool
 isValid = all Rule.isValid
+
+-- | Restrict the rules to those only using function symbols satisfying
+-- the given predicate.
+restrictFuns :: (f -> Bool) -> [Rule f v] -> [Rule f v]
+restrictFuns funp = filter (all funp . Rule.funs)
