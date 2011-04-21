@@ -40,14 +40,14 @@ type Strategy f v v' = Term f v -> [Reduct f v v']
 -- | Full rewriting: Apply rules anywhere in the term.
 --
 -- Reducts are returned in pre-order: the first is a leftmost, outermost redex.
-fullRewrite :: (Ord v', Ord v, Eq f)
+fullRewrite :: (Ord v', Eq v, Eq f)
     => [Rule f v'] -> Strategy f v v'
 fullRewrite trs t = rootRewrite trs t ++ nested (fullRewrite trs) t
 
 -- | Outer rewriting: Apply rules at outermost redexes.
 --
 -- Reducts are returned in left to right order.
-outerRewrite :: (Ord v', Ord v, Eq f)
+outerRewrite :: (Ord v', Eq v, Eq f)
     => [Rule f v'] -> Term f v -> [Reduct f v v']
 outerRewrite trs t = case rootRewrite trs t of
     [] -> nested (outerRewrite trs) t
@@ -56,7 +56,7 @@ outerRewrite trs t = case rootRewrite trs t of
 -- | Inner rewriting: Apply rules at innermost redexes.
 --
 -- Reducts are returned in left to right order.
-innerRewrite :: (Ord v', Ord v, Eq f)
+innerRewrite :: (Ord v', Eq v, Eq f)
     => [Rule f v'] -> Strategy f v v'
 innerRewrite trs t = case nested (innerRewrite trs) t of
     [] -> rootRewrite trs t
@@ -65,7 +65,7 @@ innerRewrite trs t = case nested (innerRewrite trs) t of
 -- | Root rewriting: Apply rules only at the root of the term.
 --
 -- This is mainly useful as a building block for various rewriting strategies.
-rootRewrite :: (Ord v', Ord v, Eq f)
+rootRewrite :: (Ord v', Eq v, Eq f)
     => [Rule f v'] -> Strategy f v v'
 rootRewrite trs t = do
     r <- trs
