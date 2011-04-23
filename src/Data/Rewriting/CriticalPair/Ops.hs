@@ -52,7 +52,7 @@ type Context f v = Term f v -> Term f v
 -- In particular, the root context is returned first.
 contexts :: Term f v -> [(Pos, Context f v, Term f v)]
 contexts t@(Var _)    = [([], id, t)]
-contexts t@(Fun f ts) = do
+contexts t@(Fun f ts) = ([], id, t) : do
     (i, ctxL, t) <- listContexts ts
     (pos, ctxT, t') <- contexts t
     return (i : pos, Fun f . ctxL . ctxT, t')
