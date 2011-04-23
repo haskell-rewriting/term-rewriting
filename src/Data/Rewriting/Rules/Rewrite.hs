@@ -89,4 +89,4 @@ nested s (Fun f ts) = do
 listContexts :: [a] -> [(Int, a -> [a], a)]
 listContexts = go 0 id where
     go !n f [] = []
-    go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) ((x:) . f) xs
+    go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) (f . (x:)) xs
