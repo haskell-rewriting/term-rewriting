@@ -84,9 +84,9 @@ nested s (Fun f ts) = do
     (\r -> r{ result = Fun f (cl (result r)), pos = n : pos r }) `fmap` s t
 
 -- | Return a list of contexts of a list. Each returned element is an element
--- index (starting from 1), a function that replaces the list element by a
+-- index (starting from 0), a function that replaces the list element by a
 -- new one, and the original element.
 listContexts :: [a] -> [(Int, a -> [a], a)]
-listContexts = go 1 id where
+listContexts = go 0 id where
     go !n f [] = []
     go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) ((x:) . f) xs
