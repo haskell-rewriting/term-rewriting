@@ -1,0 +1,7 @@
+To run tests, install the library and then 'runhaskell Main.hs' in this
+directory.
+
+TODO:
+- look into the new Cabal testsuite support.
+- automate the extraction of prop* from the various test modules
+
