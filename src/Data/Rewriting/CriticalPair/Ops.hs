@@ -29,15 +29,15 @@ cpW :: (Ord v, Ord v', Eq f)
         -> [(Pos, Context f (Either v v'), Term f (Either v v'))])
     -> Rule f v -> Rule f v' -> [(CP f v v')]
 cpW f rl rr = do
-    let rl' = Term.map Left id (lhs rl)
-        rr' = Term.map Right id (lhs rr)
+    let rl' = Term.map id Left (lhs rl)
+        rr' = Term.map id Right (lhs rr)
     (pos, ctx, rr'') <- f rr'
     guard $ not (Term.isVar rr'')
     subst <- maybeToList $ unify rl' rr''
     return CP{
-        left = apply subst (ctx (Term.map Left id (rhs rl))),
+        left = apply subst (ctx (Term.map id Left (rhs rl))),
         top = apply subst rr',
-        right = apply subst (Term.map Right id (rhs rr)),
+        right = apply subst (Term.map id Right (rhs rr)),
         leftRule = rl,
         leftPos = pos,
         rightRule = rr,

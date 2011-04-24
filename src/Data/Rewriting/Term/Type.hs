@@ -23,5 +23,5 @@ fold var fun (Fun f ts) = fun f (fmap (fold var fun) ts)
 --
 -- >>> map succ pred (Fun 'f' [Var 2, Fun 'g' []])
 -- Fun 'e' [Var 3,Fun 'f' []]
-map :: (v -> v') -> (f -> f') -> Term f v -> Term f' v'
-map var fun = fold (Var . var) (Fun . fun)
+map :: (f -> f') -> (v -> v') -> Term f v -> Term f' v'
+map fun var = fold (Var . var) (Fun . fun)

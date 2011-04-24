@@ -33,8 +33,8 @@ cps1 = [mkCP r1 r2 [], mkCP r3 r2 [0]]
 
 mkCP :: (Eq f, Ord v) => Rule f v -> Rule f v -> Pos -> CP f v v
 mkCP lRule rRule pos = let
-    (llhs, lrhs) = (Term.map Left id (lhs lRule), Term.map Left id (rhs lRule))
-    (rlhs, rrhs) = (Term.map Right id (lhs rRule), Term.map Right id (rhs rRule))
+    (llhs, lrhs) = (Term.map id Left (lhs lRule), Term.map id Left (rhs lRule))
+    (rlhs, rrhs) = (Term.map id Right (lhs rRule), Term.map id Right (rhs rRule))
     Just subst = Subst.unify llhs (rlhs !!! pos)
     Just rlhs' = Ctxt.ofTerm rlhs pos
   in

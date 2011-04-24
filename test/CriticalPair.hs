@@ -45,8 +45,8 @@ cpSet = S.fromList . map (\cp -> (top cp, left cp, right cp, leftRule cp, rightR
 validCP :: (Ord v, Eq f) => CP f v v -> Bool
 validCP CP{ left = left, top = top, right = right, leftPos = pos,
             leftRule = lRule, rightRule = rRule, subst = subst } =
-    subst `Subst.apply` Term.map Right id (lhs rRule) == top &&
-    subst `Subst.apply` Term.map Right id (rhs rRule) == right &&
-    subst `Subst.apply` Term.map Left id (lhs lRule) == top !!! pos &&
-    subst `Subst.apply` Term.map Left id (rhs lRule) == left !!! pos &&
+    subst `Subst.apply` Term.map id Right (lhs rRule) == top &&
+    subst `Subst.apply` Term.map id Right (rhs rRule) == right &&
+    subst `Subst.apply` Term.map id Left (lhs lRule) == top !!! pos &&
+    subst `Subst.apply` Term.map id Left (rhs lRule) == left !!! pos &&
     Ctxt.ofTerm top pos == Ctxt.ofTerm left pos
