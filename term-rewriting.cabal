@@ -58,7 +58,7 @@ library
         multiset >= 0.2 && < 0.3,
         parsec >= 3 && < 3.2,
         union-find-array >= 0.1 && < 0.2,
-        array >= 0.3 && < 0.4,
+        array >= 0.3 && < 0.5,
         ansi-wl-pprint >= 0.6 && < 0.7,
         mtl >= 1.1 && < 2.1,
         base >= 4 && < 5
