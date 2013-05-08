@@ -18,7 +18,8 @@ import qualified Data.Rewriting.Rules as Rules
 
 import Data.List (partition, union)
 import Data.Maybe (isJust)
-import Prelude hiding (lex)
+import Prelude hiding (lex, catch)
+import Control.Exception (catch)
 import Control.Monad.Error
 import Control.Monad (liftM, liftM3)
 import Text.Parsec hiding (parse)
