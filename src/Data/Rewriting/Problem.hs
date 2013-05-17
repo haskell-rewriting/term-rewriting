@@ -1,4 +1,7 @@
+-- | Termination problem type, based on WST format.
 module Data.Rewriting.Problem (
+    Problem,
+    -- * Reexported modules
     module Data.Rewriting.Problem.Type,
     module Data.Rewriting.Problem.Parse,
     module Data.Rewriting.Problem.Pretty,

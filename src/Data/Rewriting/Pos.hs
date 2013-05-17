@@ -13,15 +13,12 @@ module Data.Rewriting.Pos (
 import Data.Rewriting.Utils
 import Data.List
 
--- | A position in a term. Arguments are counted from 1.
+-- | A position in a term. Arguments are counted from 0.
 --
 -- A position describes a path in the tree representation of a term. The empty
--- position @[]@ denotes the root of the term. A position @[1,2]@ denotes the
+-- position @[]@ denotes the root of the term. A position @[0,1]@ denotes the
 -- 2nd child of the 1st child of the root (counting children from left to
 -- right).
--- 
--- TODO: Should we used zero-based indexing? Which is less confusing?
--- CS: I'm in favor of 0-based indexing
 type Pos = [Int]
 
 -- | @p \`above\` q@ checks whether @p@ is above @q@ (in the tree representation of

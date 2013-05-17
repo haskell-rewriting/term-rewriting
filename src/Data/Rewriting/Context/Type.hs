@@ -7,5 +7,6 @@ import Data.Rewriting.Term (Term(..))
 data Ctxt f v
     = Hole                                    -- ^ Hole
     | Ctxt f [Term f v] (Ctxt f v) [Term f v] -- ^ Non-empty context
-    -- CS: why would it make sense to reverse the left term list?
+
+    -- CS: would it make sense to reverse the left term list?
     deriving (Show, Eq, Ord)

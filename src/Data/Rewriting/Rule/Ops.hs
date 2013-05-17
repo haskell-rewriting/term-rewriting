@@ -16,13 +16,17 @@ module Data.Rewriting.Rule.Ops (
     isCollapsing,
     isExpanding,
     isValid,
+    isInstanceOf,
+    isVariantOf,
 ) where
 
 import Data.Rewriting.Rule.Type
+import Data.Rewriting.Substitution (match, merge)
 import qualified Data.Rewriting.Term as Term
 
 import qualified Data.Set as S
 import qualified Data.MultiSet as MS
+import Data.Maybe
 
 -- | Test whether the given predicate is true for both sides of a rule.
 both :: (Term f v -> Bool) -> Rule f v -> Bool
@@ -36,7 +40,8 @@ left f = f . lhs
 right :: (Term f v -> a) -> Rule f v -> a
 right f = f . rhs
 
--- | Lifting of 'Term.funs' to 'Rule': returns the list of function symbols in left- and right-hand sides.
+-- | Lifting of 'Term.funs' to 'Rule': returns the list of function symbols
+-- in left- and right-hand sides.
 --
 -- >>> funs $ Rule {lhs = Fun 'f' [Var 3, Fun 'g' [Fun 'f' []]], rhs = Fun 'h' [Fun 'f' []]}
 -- "fgfhf"
@@ -48,7 +53,8 @@ funs = flip funsDL []
 funsDL ::  Rule f v -> [f] -> [f]
 funsDL r = Term.funsDL (lhs r) . Term.funsDL (rhs r)
 
--- | Lifting of 'Term.vars' to 'Rule': returns the list of variables in left- and right-hand sides.
+-- | Lifting of 'Term.vars' to 'Rule': returns the list of variables in
+-- left- and right-hand sides.
 --
 -- >>> vars $ Rule {lhs = Fun 'g' [Var 3, Fun 'f' [Var 1, Var 2, Var 3]], rhs = Fun 'g' [Var 4, Var 3]}
 -- [3,1,2,3,4,3]
@@ -127,3 +133,13 @@ isExpanding = Term.isVar . lhs
 -- See also 'isCreating' and 'isExpanding'
 isValid :: Ord v => Rule f v -> Bool
 isValid r = not (isCreating r) && not (isExpanding r)
+
+-- | Check whether a rule is an instance of another.
+isInstanceOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
+isInstanceOf r r' = case (match (lhs r) (lhs r'), match (rhs r) (rhs r')) of
+    (Just s, Just s') -> isJust (merge s s')
+    _ -> False
+
+-- | Check whether a rule is a variant of another.
+isVariantOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
+isVariantOf t u = isInstanceOf t u && isInstanceOf u t

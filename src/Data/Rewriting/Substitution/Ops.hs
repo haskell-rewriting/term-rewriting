@@ -2,6 +2,7 @@ module Data.Rewriting.Substitution.Ops (
     apply,
     gApply,
     compose,
+    merge,
 ) where
 
 import Data.Rewriting.Substitution.Type
@@ -31,3 +32,11 @@ gApply subst = Term.fold var fun where
 compose :: (Ord v) => Subst f v -> Subst f v -> Subst f v
 compose subst subst' =
     fromMap (M.unionWith const (apply subst <$> toMap subst') (toMap subst))
+
+-- | Merge two substitutions. The operation fails if some variable is
+-- different terms by the substitutions.
+merge :: (Ord v, Eq f, Eq v')
+    => GSubst v f v' -> GSubst v f v' -> Maybe (GSubst v f v')
+merge subst subst' = do
+    guard $ and (M.elems (M.intersectionWith (==) (toMap subst) (toMap subst')))
+    return $ fromMap $ M.union (toMap subst) (toMap subst')

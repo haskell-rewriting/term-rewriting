@@ -1,6 +1,12 @@
+-- | Operations on lists of rules.
+--
+-- See also "Data.Rewriting.CriticalPair"
 module Data.Rewriting.Rules (
-    module Data.Rewriting.Rules.Rewrite, 
-    module Data.Rewriting.Rules.Ops, 
+    -- * Important operations
+    fullRewrite,
+    -- * Reexported modules
+    module Data.Rewriting.Rules.Rewrite,
+    module Data.Rewriting.Rules.Ops,
 ) where
 
 import Data.Rewriting.Rules.Ops

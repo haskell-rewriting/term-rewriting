@@ -1,4 +1,11 @@
 module Data.Rewriting.Substitution (
+    GSubst,
+    Subst,
+    -- * Important operations
+    gApply,
+    apply,
+    compose,
+    -- * Reexported modules
     module Data.Rewriting.Substitution.Type,
     module Data.Rewriting.Substitution.Ops,
     module Data.Rewriting.Substitution.Match,

@@ -1,4 +1,9 @@
 module Data.Rewriting.Context (
+    Ctxt,
+    -- * Important operations
+    ofTerm,
+    apply,
+    -- * Reexported modules
     module Data.Rewriting.Context.Type,
     module Data.Rewriting.Context.Ops,
 ) where

@@ -5,15 +5,20 @@ module Data.Rewriting.Term.Ops (
     vars,
     varsDL,
     withArity,
+    subtermAt,
     -- * Predicates on Terms
     isVar,
     isFun,
     isGround,
     isLinear,
-
+    isInstanceOf,
+    isVariantOf,
 ) where
 
+import Data.Rewriting.Pos
 import Data.Rewriting.Term.Type as Term
+import Data.Rewriting.Substitution.Match
+import Data.Maybe
 import qualified Data.MultiSet as MS
 
 
@@ -25,6 +30,11 @@ import qualified Data.MultiSet as MS
 withArity :: Term f v -> Term (f, Int) v
 withArity = Term.fold Var (\f ts -> Fun (f, length ts) ts)
 
+-- | Return the subterm at a given position.
+subtermAt :: Term f v -> Pos -> Maybe (Term f v)
+subtermAt t [] = Just t
+subtermAt (Fun _ ts) (p:ps) | p >= 0 && p < length ts = subtermAt (ts !! p) ps
+subtermAt _ _ = Nothing
 
 -- | Return the list of all variables in the term, from left to right.
 --
@@ -70,3 +80,11 @@ isGround = null . vars
 -- once.
 isLinear :: Ord v => Term f v -> Bool
 isLinear = all (\(_, c) -> c == 1) . MS.toOccurList . MS.fromList . vars
+
+-- | Check whether a term is an instance of another.
+isInstanceOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
+isInstanceOf t u = isJust (match u t)
+
+-- | Check whether a term is a variant of another.
+isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
+isVariantOf t u = isInstanceOf t u && isInstanceOf u t

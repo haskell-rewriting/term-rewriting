@@ -12,7 +12,7 @@ module Data.Rewriting.Rules.Rewrite (
     outerRewrite,
     innerRewrite,
     rootRewrite,
-    -- * utilities not reexported from 'Data.Rewriting.Rules'
+    -- * utilities not reexported from "Data.Rewriting.Rules"
     nested,
     listContexts,
 ) where
@@ -25,8 +25,6 @@ import Data.Maybe
 
 -- | A reduct. It contains the resulting term, the position that the term
 -- was rewritten at, and the applied rule.
---
--- TODO: should this be a proper record?
 data Reduct f v v' = Reduct {
      result :: Term f v,
      pos :: Pos,
@@ -48,7 +46,7 @@ fullRewrite trs t = rootRewrite trs t ++ nested (fullRewrite trs) t
 --
 -- Reducts are returned in left to right order.
 outerRewrite :: (Ord v', Eq v, Eq f)
-    => [Rule f v'] -> Term f v -> [Reduct f v v']
+    => [Rule f v'] -> Strategy f v v'
 outerRewrite trs t = case rootRewrite trs t of
     [] -> nested (outerRewrite trs) t
     rs -> rs
