@@ -1,3 +1,8 @@
+-- This file is part of the 'term-rewriting' library. It is licensed
+-- under an MIT license. See the accompanying 'LICENSE' file for details.
+--
+-- Authors: Martin Avanzini
+
 module Data.Rewriting.Problem.Pretty (
     prettyProblem,
     prettyWST,

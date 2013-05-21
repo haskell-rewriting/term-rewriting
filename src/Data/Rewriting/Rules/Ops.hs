@@ -1,3 +1,6 @@
+-- This file is part of the 'term-rewriting' library. It is licensed
+-- under an MIT license. See the accompanying 'LICENSE' file for details.
+--
 -- Authors: Martin Avanzini, Bertram Felgenhauer
 
 module Data.Rewriting.Rules.Ops (

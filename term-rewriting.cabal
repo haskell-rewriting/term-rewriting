@@ -5,8 +5,8 @@ author:        Martin Avanzini,
                Bertram Felgenhauer,
                Christian Sternagel
 maintainer:    
-license:       LGPL
-license-file:  COPYING.LESSER
+license:       MIT
+license-file:  LICENSE
 category:      Logic
 synopsis:      Term Rewriting Library
 description:   

@@ -1,3 +1,6 @@
+-- This file is part of the 'term-rewriting' library. It is licensed
+-- under an MIT license. See the accompanying 'LICENSE' file for details.
+--
 -- Authors: Bertram Felgenhauer
 
 -- Tests for Data.Rewriting.Substitution

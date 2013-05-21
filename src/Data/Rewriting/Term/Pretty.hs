@@ -1,3 +1,6 @@
+-- This file is part of the 'term-rewriting' library. It is licensed
+-- under an MIT license. See the accompanying 'LICENSE' file for details.
+--
 -- Auhtors: Martin Avanzini, Christian Sternagel
 
 module Data.Rewriting.Term.Pretty (
