@@ -1,17 +1,19 @@
+-- Authors: Martin Avanzini, Christial Sternagel
+
 module Data.Rewriting.Problem.Type (
-  StartTerms (..), 
-  Strategy (..), 
+  StartTerms (..),
+  Strategy (..),
   RulesPair (..),
-  Problem (..), 
+  Problem (..),
   Theory (..),
   allRules
- ) where 
+ ) where
 
 import Data.Rewriting.Rule (Rule (..))
 
 data StartTerms = AllTerms
                 | BasicTerms deriving (Eq, Show)
-                                      
+
 data Strategy = Innermost
               | Full
               | Outermost deriving (Eq, Show)
@@ -28,7 +30,7 @@ data Problem f v = Problem { startTerms :: StartTerms
                            , theory     :: Maybe [Theory f v]
                            , rules      :: RulesPair f v
                            , variables  :: [v]
-                           , symbols    :: [f] 
+                           , symbols    :: [f]
                            , comment    :: Maybe String} deriving (Show)
 
 allRules :: RulesPair f v -> [Rule f v]

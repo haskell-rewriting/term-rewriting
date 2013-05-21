@@ -1,3 +1,5 @@
+-- Author: Bertram Felgenhauer
+
 module Data.Rewriting.Context (
     Ctxt,
     -- * Important operations

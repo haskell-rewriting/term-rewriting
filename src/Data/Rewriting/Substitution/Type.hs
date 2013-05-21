@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 module Data.Rewriting.Substitution.Type (
     Subst,
     GSubst,
@@ -27,4 +29,3 @@ fromMap = GS
 
 toMap :: GSubst v f v' -> M.Map v (Term f v')
 toMap = unGS
-

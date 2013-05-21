@@ -1,10 +1,8 @@
 name:          term-rewriting
-version:       0.0
+version:       0.1
 stability:     experimental
 author:        Martin Avanzini,
                Bertram Felgenhauer,
-               Georg Moser,
-               Andreas Schnabel,
                Christian Sternagel
 maintainer:    
 license:       LGPL
@@ -12,9 +10,16 @@ license-file:  COPYING.LESSER
 category:      Logic
 synopsis:      Term Rewriting Library
 description:   
-  Yet Another  Term Rewriting Library
+  Yet Another Term Rewriting Library.
+  |
+  This library provides basic data types and functionality for first order
+  term rewriting.
 build-type:    Simple
 cabal-version: >= 1.6
+
+source-repository head
+    type: git
+    location: git://github.com/haskell-rewriting/term-rewriting
 
 library
     hs-source-dirs:

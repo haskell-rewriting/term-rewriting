@@ -1,3 +1,5 @@
+-- Authors: Christian Sternagel, Bertram Felgenhauer, Martin Avanzini
+
 module Data.Rewriting.Pos (
     Pos,
     -- * Comparing Positions

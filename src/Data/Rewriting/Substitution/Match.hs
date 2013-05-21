@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 module Data.Rewriting.Substitution.Match (
     match,
 ) where

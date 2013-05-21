@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer, Christian Sternagel
+
 module Data.Rewriting.Substitution.Ops (
     apply,
     gApply,

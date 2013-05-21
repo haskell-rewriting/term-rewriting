@@ -1,3 +1,5 @@
+-- Authors: Christian Sternagel
+
 module Data.Rewriting.Utils (
     dropCommonPrefix,
 ) where

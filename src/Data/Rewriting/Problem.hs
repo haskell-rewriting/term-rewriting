@@ -1,3 +1,5 @@
+-- Authors: Martin Avanzini
+
 -- | Termination problem type, based on WST format.
 module Data.Rewriting.Problem (
     Problem,

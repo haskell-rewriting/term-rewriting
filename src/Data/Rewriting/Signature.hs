@@ -1,4 +1,6 @@
--- Here be dragons.
+-- Authors: Bertram Felgenhauer
+
+-- Here be dragons. (What are signatures exactly?)
 
 -- fix some signature type. but which?
 

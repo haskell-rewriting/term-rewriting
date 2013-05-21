@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 module Data.Rewriting.Term.Type (
     Term (..),
     fold,

@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 -- Tests for Data.Rewriting.Substitution
 
 module Substitution where

@@ -1,3 +1,5 @@
+-- Authors: Christian Sternagel
+
 module Data.Rewriting.Context.Type (
     Ctxt (..),
 ) where

@@ -1,3 +1,5 @@
+-- Authors: Christian Sternagel
+
 {-# LANGUAGE FlexibleContexts#-}
 module Data.Rewriting.Term.Parse (
     fromString,
@@ -35,7 +37,7 @@ fromString xs = runP (parseWST xs) () ""
 -- parsers for function symbols and variables, respectively. The @var@ parser
 -- has a higher priority than the @fun@ parser. Hence, whenever @var@
 -- succeeds, the token is treated as a variable.
--- 
+--
 -- Note that the user has to take care of handling trailing white space in
 -- @fun@ and @var@.
 parse :: Stream s m Char => ParsecT s u m f -> ParsecT s u m v

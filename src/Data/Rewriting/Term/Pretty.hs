@@ -1,6 +1,8 @@
+-- Auhtors: Martin Avanzini, Christian Sternagel
+
 module Data.Rewriting.Term.Pretty (
     prettyTerm,
-) where                        
+) where
 
 import Data.Rewriting.Term.Type
 import Text.PrettyPrint.ANSI.Leijen

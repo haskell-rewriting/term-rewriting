@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 {-# LANGUAGE BangPatterns #-}
 -- |
 -- Simple rewriting.

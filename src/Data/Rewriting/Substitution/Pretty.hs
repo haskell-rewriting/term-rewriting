@@ -1,7 +1,9 @@
+-- Authors: Martin Avanzini
+
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 module Data.Rewriting.Substitution.Pretty (
     prettySubst
-) where 
+) where
 
 import Data.Rewriting.Substitution.Type
 import Data.Rewriting.Term (prettyTerm)
@@ -10,7 +12,7 @@ import qualified Data.Map as M
 import Text.PrettyPrint.ANSI.Leijen
 
 prettyGSubst :: (v -> Doc) -> (f -> Doc) -> (v' -> Doc) -> GSubst v f v' -> Doc
-prettyGSubst var fun var' subst = 
+prettyGSubst var fun var' subst =
     encloseSep lbrace rbrace comma [ppBinding v t | (v,t) <- M.toList $ toMap subst]
     where ppBinding v t = var v <> text "/" <> prettyTerm fun var' t
 

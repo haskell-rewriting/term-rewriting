@@ -1,3 +1,5 @@
+-- Authors: Martin Avanzini, Bertram Felgenhauer
+
 module Data.Rewriting.Term.Ops (
     -- * Operations on Terms
     funs,

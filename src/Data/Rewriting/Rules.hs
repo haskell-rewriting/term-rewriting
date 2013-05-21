@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer, Martin Avanzini
+
 -- | Operations on lists of rules.
 --
 -- See also "Data.Rewriting.CriticalPair"

@@ -1,3 +1,5 @@
+-- Authors: Christian Sternagel
+
 {-# LANGUAGE FlexibleContexts#-}
 module Data.Rewriting.Substitution.Parse (
     fromString,

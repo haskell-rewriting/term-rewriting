@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer, Martin Avanzini
+
 module Data.Rewriting.Rule (
     Rule (..),
     -- * Reexported modules

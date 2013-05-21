@@ -1,4 +1,6 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+-- Authors: Bertram Felgenhauer
+
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 
 -- Types and Arbitrary instances for tests.
 

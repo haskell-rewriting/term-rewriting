@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 -- Tests for Data.Rewriting.CriticalPair
 
 module CriticalPair where

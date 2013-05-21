@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 module Data.Rewriting.CriticalPair.Ops (
     -- * pairs of rewrite systems
     cps,

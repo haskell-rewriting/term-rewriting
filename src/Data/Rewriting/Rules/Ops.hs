@@ -1,3 +1,5 @@
+-- Authors: Martin Avanzini, Bertram Felgenhauer
+
 module Data.Rewriting.Rules.Ops (
     -- * Operations on Rules
     funs,

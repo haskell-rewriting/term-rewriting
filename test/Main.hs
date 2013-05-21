@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 -- Main test driver.
 
 module Main (main) where

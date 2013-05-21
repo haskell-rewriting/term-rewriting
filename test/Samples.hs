@@ -1,3 +1,5 @@
+-- Authors: Bertram Felgenhauer
+
 {-# LANGUAGE StandaloneDeriving #-}
 
 -- selected samples for tests
