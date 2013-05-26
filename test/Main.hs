@@ -8,6 +8,7 @@
 module Main (main) where
 
 import qualified Pos
+import qualified Term
 import qualified Rule
 import qualified CriticalPair
 import qualified Substitution
@@ -20,6 +21,8 @@ import System.IO
 properties :: [(String, Property)]
 properties = [
     ("Pos.propParallelTo", property Pos.propParallelTo),
+    ("Term.propReplaceAt1", property Term.propReplaceAt1),
+    ("Term.propReplaceAt2", property Term.propReplaceAt2),
     ("Rule.propLeftRightLinearDual", property Rule.propLeftRightLinearDual),
     ("Rule.propCollapsingExpandingDual", property Rule.propCollapsingExpandingDual),
     ("Rule.propErasingCreatingDual", property Rule.propErasingCreatingDual),
