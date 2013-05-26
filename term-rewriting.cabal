@@ -11,7 +11,7 @@ category:      Logic
 synopsis:      Term Rewriting Library
 description:   
   Yet Another Term Rewriting Library.
-  |
+  .
   This library provides basic data types and functionality for first order
   term rewriting.
 build-type:    Simple
