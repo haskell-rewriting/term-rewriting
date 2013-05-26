@@ -27,6 +27,7 @@ import Data.Rewriting.Substitution.Match
 import Data.Maybe
 import qualified Data.MultiSet as MS
 
+import Control.Monad (guard)
 
 -- | Annotate each occurrence of a function symbol with its actual arity,
 -- i.e., its number of arguments.
@@ -52,7 +53,8 @@ replaceAt (Fun f ts) (i:p) t' = do
     guard (i >= 0 && i < length ts)
     let (ts1, t:ts2) = splitAt i ts
     t <- replaceAt t p t'
-    return Fun f (ts1 ++ t : ts2)
+    return $ Fun f (ts1 ++ t : ts2)
+replaceAt _ _ _ = Nothing
 
 -- | Return the list of all variables in the term, from left to right.
 --
