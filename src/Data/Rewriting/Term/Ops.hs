@@ -11,6 +11,7 @@ module Data.Rewriting.Term.Ops (
     varsDL,
     withArity,
     subtermAt,
+    replaceAt,
     -- * Predicates on Terms
     isVar,
     isFun,
@@ -40,6 +41,18 @@ subtermAt :: Term f v -> Pos -> Maybe (Term f v)
 subtermAt t [] = Just t
 subtermAt (Fun _ ts) (p:ps) | p >= 0 && p < length ts = subtermAt (ts !! p) ps
 subtermAt _ _ = Nothing
+
+-- NOTE: replaceAt and Context.ofTerm have the same recusion structure; is
+-- there a nice higher-order function to abstract from it?
+
+-- | replace a subterm at a given position.
+replaceAt :: Term f v -> Pos -> Term f v -> Maybe (Term f v)
+replaceAt _ [] t' = Just t'
+replaceAt (Fun f ts) (i:p) t' = do
+    guard (i >= 0 && i < length ts)
+    let (ts1, t:ts2) = splitAt i ts
+    t <- replaceAt t p t'
+    return Fun f (ts1 ++ t : ts2)
 
 -- | Return the list of all variables in the term, from left to right.
 --
