@@ -3,7 +3,8 @@ version:       0.1
 stability:     experimental
 author:        Martin Avanzini,
                Bertram Felgenhauer,
-               Christian Sternagel
+               Christian Sternagel,
+               Ilya Epifanov
 maintainer:    haskell-rewriting@informatik.uibk.ac.at
 license:       MIT
 license-file:  LICENSE
@@ -25,6 +26,10 @@ library
     hs-source-dirs:
         src
     exposed-modules:
+        Data.Rewriting.Axiom
+        Data.Rewriting.Axiom.Type
+        Data.Rewriting.Axiom.Ops
+        Data.Rewriting.Axiom.Pretty
         Data.Rewriting.Term
         Data.Rewriting.Term.Type
         Data.Rewriting.Term.Ops 
@@ -49,6 +54,7 @@ library
         Data.Rewriting.Rules
         Data.Rewriting.Rules.Rewrite
         Data.Rewriting.Rules.Ops
+        Data.Rewriting.Rules.Confluent
         Data.Rewriting.Context
         Data.Rewriting.Context.Type
         Data.Rewriting.Context.Ops

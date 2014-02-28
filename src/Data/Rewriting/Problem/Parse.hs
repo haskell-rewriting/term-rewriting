@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Martin Avanzini, Christian Sternagel
+-- Authors: Martin Avanzini, Christian Sternagel, Ilya Epifanov
 
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -17,9 +17,9 @@ module Data.Rewriting.Problem.Parse (
 import Data.Rewriting.Utils.Parse (lex, par, ident)
 import qualified Data.Rewriting.Problem.Type as Prob
 import Data.Rewriting.Problem.Type (Problem)
-import Data.Rewriting.Rule (Rule (..))
+import Data.Rewriting.Rule.Type (Rule (..))
 import qualified Data.Rewriting.Term as Term
-import qualified Data.Rewriting.Rules as Rules
+import qualified Data.Rewriting.Rules.Ops as Rules
 
 import Data.List (partition, union)
 import Data.Maybe (isJust)

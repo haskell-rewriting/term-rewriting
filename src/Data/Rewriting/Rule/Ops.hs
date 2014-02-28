@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Bertram Felgenhauer, Martin Avanzini
+-- Authors: Bertram Felgenhauer, Martin Avanzini, Ilya Epifanov
 
 module Data.Rewriting.Rule.Ops (
     -- * Operations on Rules
@@ -11,6 +11,7 @@ module Data.Rewriting.Rule.Ops (
     varsDL,
     left,
     right,
+    canonify,
     -- * Predicates on Rules
     both,
     isLinear, isLeftLinear, isRightLinear,
@@ -23,6 +24,7 @@ module Data.Rewriting.Rule.Ops (
     isValid,
     isInstanceOf,
     isVariantOf,
+    isTrivial
 ) where
 
 import Data.Rewriting.Rule.Type
@@ -30,7 +32,9 @@ import Data.Rewriting.Substitution (match, merge)
 import qualified Data.Rewriting.Term as Term
 
 import qualified Data.Set as S
+import qualified Data.List as L
 import qualified Data.MultiSet as MS
+import qualified Data.Map as M
 import Data.Maybe
 
 -- | Test whether the given predicate is true for both sides of a rule.
@@ -148,3 +152,12 @@ isInstanceOf r r' = case (match (lhs r) (lhs r'), match (rhs r) (rhs r')) of
 -- | Check whether a rule is a variant of another.
 isVariantOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
+
+-- | Rewrite variables in the canonical order
+canonify :: (Ord v) => [v] -> Rule f v -> Rule f v
+canonify vs r@(Rule lhs rhs) =
+  Rule (Term.map id (mapping M.!) lhs) (Term.map id (mapping M.!) rhs) where
+    mapping = M.fromList (zip (L.nub $ vars r) vs)
+
+isTrivial :: (Eq f, Eq v) => Rule f v -> Bool
+isTrivial (Rule lhs rhs) = lhs == rhs
