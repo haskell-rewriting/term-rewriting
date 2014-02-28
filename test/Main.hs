@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Bertram Felgenhauer
+-- Authors: Bertram Felgenhauer, Ilya Epifanov
 
 -- Main test driver.
 
@@ -23,6 +23,7 @@ properties = [
     ("Pos.propParallelTo", property Pos.propParallelTo),
     ("Term.propReplaceAt1", property Term.propReplaceAt1),
     ("Term.propReplaceAt2", property Term.propReplaceAt2),
+    ("Term.propTermsAreComparable", property Term.propTermsAreComparable),
     ("Rule.propLeftRightLinearDual", property Rule.propLeftRightLinearDual),
     ("Rule.propCollapsingExpandingDual", property Rule.propCollapsingExpandingDual),
     ("Rule.propErasingCreatingDual", property Rule.propErasingCreatingDual),

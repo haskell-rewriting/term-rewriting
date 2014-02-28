@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Bertram Felgenhauer
+-- Authors: Bertram Felgenhauer, Ilya Epifanov
 
 {-# LANGUAGE BangPatterns #-}
 -- |
@@ -17,6 +17,9 @@ module Data.Rewriting.Rules.Rewrite (
     outerRewrite,
     innerRewrite,
     rootRewrite,
+    reduceTerm,
+    reduceRule,
+    reduceAxiom,
     -- * utilities not reexported from "Data.Rewriting.Rules"
     nested,
     listContexts,
@@ -25,6 +28,8 @@ module Data.Rewriting.Rules.Rewrite (
 import Data.Rewriting.Substitution
 import Data.Rewriting.Pos
 import Data.Rewriting.Rule
+import Data.Rewriting.Axiom
+import Control.Applicative
 
 import Data.Maybe
 
@@ -93,3 +98,12 @@ listContexts :: [a] -> [(Int, a -> [a], a)]
 listContexts = go 0 id where
     go !n f [] = []
     go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) (f . (x:)) xs
+
+reduceTerm :: (Eq f, Ord v, Ord f) => [Rule f v] -> Term f v -> Term f v
+reduceTerm rs t = minimum $ t:(result <$> fullRewrite rs t)
+
+reduceRule :: (Eq f, Ord f, Ord v) => [Rule f v] -> Rule f v -> Rule f v
+reduceRule rs (Rule lhs rhs) = Rule (reduceTerm rs lhs) (reduceTerm rs rhs)
+
+reduceAxiom :: (Eq f, Ord f, Ord v) => [Rule f v] -> Axiom f v -> Axiom f v
+reduceAxiom rs (Axiom e1 e2) = Axiom (reduceTerm rs e1) (reduceTerm rs e2)

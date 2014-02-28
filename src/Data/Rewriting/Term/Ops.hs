@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Martin Avanzini, Bertram Felgenhauer
+-- Authors: Martin Avanzini, Bertram Felgenhauer, Ilya Epifanov
 
 module Data.Rewriting.Term.Ops (
     -- * Operations on Terms
@@ -12,6 +12,7 @@ module Data.Rewriting.Term.Ops (
     withArity,
     subtermAt,
     replaceAt,
+    flatten,
     -- * Predicates on Terms
     isVar,
     isFun,
@@ -26,6 +27,7 @@ import Data.Rewriting.Term.Type as Term
 import Data.Rewriting.Substitution.Match
 import Data.Maybe
 import qualified Data.MultiSet as MS
+import qualified Data.Rewriting.Utils.Either
 
 import Control.Monad (guard)
 
@@ -108,3 +110,8 @@ isInstanceOf t u = isJust (match u t)
 -- | Check whether a term is a variant of another.
 isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
+
+-- | Disambiguates the type of variable symbol after rewriting if
+-- there's only one possible.
+flatten :: Term f (Either v v) -> Term f v
+flatten = Term.map id Data.Rewriting.Utils.Either.flatten

@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Bertram Felgenhauer
+-- Authors: Bertram Felgenhauer, Ilya Epifanov
 
 module Data.Rewriting.CriticalPair.Ops (
     -- * pairs of rewrite systems
@@ -12,12 +12,15 @@ module Data.Rewriting.CriticalPair.Ops (
     cps',
     cpsIn',
     cpsOut',
+    -- *
+    toAxiom
 ) where
 
+import Data.Rewriting.Axiom.Type
 import Data.Rewriting.CriticalPair.Type
 import Data.Rewriting.Substitution
 import Data.Rewriting.Rule.Type
-import qualified Data.Rewriting.Term as Term
+import qualified Data.Rewriting.Term as Term (isVar, flatten, map)
 import Data.Rewriting.Pos
 import Data.Rewriting.Rules.Rewrite (listContexts)
 
@@ -138,3 +141,6 @@ cpsOut' trs = do
     rl : trs' <- tails trs
     rr <- trs'
     cpOut rl rr
+
+toAxiom :: CP f v v -> Axiom f v
+toAxiom cp = Axiom (Term.flatten $ left cp) (Term.flatten $ right cp)

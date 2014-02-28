@@ -1,7 +1,7 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Bertram Felgenhauer
+-- Authors: Bertram Felgenhauer, Ilya Epifanov
 
 -- Tests for Data.Rewriting.Term
 
@@ -26,3 +26,6 @@ propReplaceAt2 p t t1 t2 = fromMaybe True $ do
     u1 <- replaceAt t p t1
     u2 <- replaceAt t p t2
     return $ (u1 == u2) == (t1 == t2)
+
+propTermsAreComparable :: Term' -> Term' -> Bool
+propTermsAreComparable t1 t2 = seq (t1 `compare` t2) True
