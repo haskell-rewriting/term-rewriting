@@ -5,6 +5,7 @@ author:        Martin Avanzini,
                Bertram Felgenhauer,
                Christian Sternagel,
                Ilya Epifanov
+homepage:      http://cl-informatik.uibk.ac.at/software/haskell-rewriting/
 maintainer:    haskell-rewriting@informatik.uibk.ac.at
 license:       MIT
 license-file:  LICENSE
