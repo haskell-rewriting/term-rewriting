@@ -9,9 +9,13 @@ module Data.Rewriting.Term.Ops (
     funsDL,
     vars,
     varsDL,
+    root,
     withArity,
     subtermAt,
+    properSubterms,
+    subterms,
     replaceAt,
+    rename,
     -- * Predicates on Terms
     isVar,
     isFun,
@@ -43,6 +47,20 @@ subtermAt t [] = Just t
 subtermAt (Fun _ ts) (p:ps) | p >= 0 && p < length ts = subtermAt (ts !! p) ps
 subtermAt _ _ = Nothing
 
+-- | Return the list of all proper subterms.
+-- 
+-- >>> properSubterms (Fun 'g' [Fun 'f' [Var 1], Fun 'f' [Var 1]])
+-- [Fun 'f' [Var 1],Var 1,Fun 'f' [Var 1],Var 1]
+properSubterms :: Term f v -> [Term f v]
+properSubterms (Var _) = []
+properSubterms (Fun _ ts) = concatMap subterms ts
+
+-- | Return the list of all subterm.
+-- 
+-- prop> subterms t = t : properSubterms t
+subterms :: Term f v -> [Term f v]
+subterms t = t : properSubterms t
+
 -- NOTE: replaceAt and Context.ofTerm have the same recusion structure; is
 -- there a nice higher-order function to abstract from it?
 
@@ -69,6 +87,18 @@ vars = flip varsDL []
 varsDL :: Term f v -> [v] -> [v]
 varsDL = Term.fold (:) (const $ foldr (.) id)
 
+
+-- | Return the root symbol of the given term.
+--
+-- >>> root (Fun 'f' [Var 1, Fun 'g' []])
+-- Right 'f'
+--
+-- >>> root (Var 1)
+-- Left 1
+root :: Term f v -> Either v f
+root (Fun f _) = Right f
+root (Var v) = Left v
+
 -- | Return the list of all function symbols in the term, from left to right.
 --
 -- >>> funs (Fun 'f' [Var 3, Fun 'g' [Fun 'f' []]])
@@ -78,7 +108,6 @@ funs = flip funsDL []
 
 -- | Difference List version of 'funs'.
 -- We have @funsDL t vs = funs t ++ vs@.
-
 funsDL :: Term f v -> [f] -> [f]
 funsDL = Term.fold (const id) (\f xs -> (f:) . foldr (.) id xs)
 
@@ -108,3 +137,10 @@ isInstanceOf t u = isJust (match u t)
 -- | Check whether a term is a variant of another.
 isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
+
+-- | Rename the variables in a term.
+-- 
+-- >>> rename (+ 1) (Fun 'f' [Var 1, Fun 'g' [Var 2]])
+-- (Fun 'f' [Var 2, Fun 'g' [Var 3]])
+rename :: (v -> v') -> Term f v -> Term f v'
+rename = Term.map id 

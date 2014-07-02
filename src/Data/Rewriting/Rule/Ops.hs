@@ -11,6 +11,7 @@ module Data.Rewriting.Rule.Ops (
     varsDL,
     left,
     right,
+    rename,
     -- * Predicates on Rules
     both,
     isLinear, isLeftLinear, isRightLinear,
@@ -44,6 +45,15 @@ left f = f . lhs
 -- | Apply a function to the rhs of a rule.
 right :: (Term f v -> a) -> Rule f v -> a
 right f = f . rhs
+
+
+-- | Lifting of 'Term.rename' to 'Rule': renames left- and
+-- right-hand sides.
+-- >>> rename (+ 1) $ Rule {lhs = (Fun 'f' [Var 1, Fun 'g' [Var 2]]), rhs = Fun 'g' [Var 1]}
+-- Rule {lhs = (Fun 'f' [Var 2, Fun 'g' [Var 3]]), rhs = Fun 'g' [Var 2]}
+rename :: (v -> v') -> Rule f v -> Rule f v'
+rename f rl = Rule (left (Term.rename f) rl) (right (Term.rename f) rl)
+
 
 -- | Lifting of 'Term.funs' to 'Rule': returns the list of function symbols
 -- in left- and right-hand sides.
