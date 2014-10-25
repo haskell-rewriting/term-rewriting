@@ -18,6 +18,7 @@ import Data.Rewriting.Substitution.Type
 import qualified Data.Rewriting.Term.Parse as Term
 import Control.Monad
 import Text.Parsec hiding (parse)
+import Text.Parsec.Prim (runP)
 
 
 parse :: (Ord v) =>

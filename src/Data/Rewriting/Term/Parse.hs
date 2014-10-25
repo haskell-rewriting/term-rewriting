@@ -19,6 +19,7 @@ import Control.Monad
 import Control.Monad.Error ()
 import Data.Rewriting.Term.Type
 import Text.Parsec hiding (parse)
+import Text.Parsec.Prim (runP)
 
 -- | Like 'fromString', but the result is wrapped in the IO monad, making this
 -- function useful for interactive testing.
