@@ -48,7 +48,7 @@ subtermAt (Fun _ ts) (p:ps) | p >= 0 && p < length ts = subtermAt (ts !! p) ps
 subtermAt _ _ = Nothing
 
 -- | Return the list of all proper subterms.
--- 
+--
 -- >>> properSubterms (Fun 'g' [Fun 'f' [Var 1], Fun 'f' [Var 1]])
 -- [Fun 'f' [Var 1],Var 1,Fun 'f' [Var 1],Var 1]
 properSubterms :: Term f v -> [Term f v]
@@ -56,7 +56,7 @@ properSubterms (Var _) = []
 properSubterms (Fun _ ts) = concatMap subterms ts
 
 -- | Return the list of all subterms.
--- 
+--
 -- prop> subterms t = t : properSubterms t
 subterms :: Term f v -> [Term f v]
 subterms t = t : properSubterms t
@@ -139,8 +139,8 @@ isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
 
 -- | Rename the variables in a term.
--- 
+--
 -- >>> rename (+ 1) (Fun 'f' [Var 1, Fun 'g' [Var 2]])
 -- (Fun 'f' [Var 2, Fun 'g' [Var 3]])
 rename :: (v -> v') -> Term f v -> Term f v'
-rename = Term.map id 
+rename = Term.map id

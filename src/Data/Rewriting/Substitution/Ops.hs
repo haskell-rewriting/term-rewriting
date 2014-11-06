@@ -6,7 +6,7 @@
 module Data.Rewriting.Substitution.Ops (
     apply,
     applyRule,
-    applyCtxt,    
+    applyCtxt,
     gApply,
     compose,
     merge,
