@@ -151,7 +151,7 @@ isValid r = not (isCreating r) && not (isExpanding r)
 
 -- | Check whether a rule is an instance of another.
 isInstanceOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
-isInstanceOf r r' = case (match (lhs r) (lhs r'), match (rhs r) (rhs r')) of
+isInstanceOf r r' = case (match (lhs r') (lhs r), match (rhs r') (rhs r)) of
     (Just s, Just s') -> isJust (merge s s')
     _ -> False
 
