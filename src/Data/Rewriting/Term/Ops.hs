@@ -55,7 +55,7 @@ properSubterms :: Term f v -> [Term f v]
 properSubterms (Var _) = []
 properSubterms (Fun _ ts) = concatMap subterms ts
 
--- | Return the list of all subterm.
+-- | Return the list of all subterms.
 -- 
 -- prop> subterms t = t : properSubterms t
 subterms :: Term f v -> [Term f v]
@@ -130,11 +130,11 @@ isGround = null . vars
 isLinear :: Ord v => Term f v -> Bool
 isLinear = all (\(_, c) -> c == 1) . MS.toOccurList . MS.fromList . vars
 
--- | Check whether a term is an instance of another.
+-- | Check whether the first term is an instance of the second term.
 isInstanceOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isInstanceOf t u = isJust (match u t)
 
--- | Check whether a term is a variant of another.
+-- | Check whether two terms are variants of each other.
 isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
 

@@ -144,17 +144,17 @@ isCollapsing = Term.isVar . rhs
 isExpanding :: Rule f v -> Bool
 isExpanding = Term.isVar . lhs
 
--- | Check whether rule is non-creating and non-expanding.
+-- | Check whether the given rule is non-creating and non-expanding.
 -- See also 'isCreating' and 'isExpanding'
 isValid :: Ord v => Rule f v -> Bool
 isValid r = not (isCreating r) && not (isExpanding r)
 
--- | Check whether a rule is an instance of another.
+-- | Check whether the first rule is an instance of the second rule.
 isInstanceOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
 isInstanceOf r r' = case (match (lhs r') (lhs r), match (rhs r') (rhs r)) of
     (Just s, Just s') -> isJust (merge s s')
     _ -> False
 
--- | Check whether a rule is a variant of another.
+-- | Check whether two rules are variants of each other.
 isVariantOf :: (Eq f, Ord v, Ord v') => Rule f v -> Rule f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
