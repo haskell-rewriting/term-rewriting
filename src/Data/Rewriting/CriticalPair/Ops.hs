@@ -94,7 +94,7 @@ cpsIn :: (Ord v, Ord v', Eq f) => [Rule f v] -> [Rule f v']
 cpsIn trs1 trs2 = do
     rl <- trs1
     rr <- trs2
-    cpOut rl rr
+    cpIn rl rr
 
 -- | Determine outer critical pairs for a pair of TRSs.
 --
@@ -104,7 +104,7 @@ cpsOut :: (Ord v, Ord v', Eq f) => [Rule f v] -> [Rule f v']
 cpsOut trs1 trs2 = do
     rl <- trs1
     rr <- trs2
-    cpIn rl rr
+    cpOut rl rr
 
 
 -- | Determine all critical pairs of a single TRS with itself.
