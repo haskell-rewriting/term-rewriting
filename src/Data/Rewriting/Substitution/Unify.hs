@@ -3,6 +3,8 @@
 --
 -- Authors: Bertram Felgenhauer
 
+{-# LANGUAGE FlexibleContexts #-}
+
 module Data.Rewriting.Substitution.Unify (
     unify,
     unifyRef,
