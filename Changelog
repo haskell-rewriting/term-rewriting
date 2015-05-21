@@ -1,0 +1,14 @@
+version 0.2
+	- fix argument order of Data.Rewriting.Rule.isVariantOf
+
+version 0.1.2.2
+	- fix build with ghc-7.10.1
+
+version 0.1.2.1
+	- fix Data.Rewriting.CriticalPair.cpsIn and cpsOut
+
+version 0.1.2
+	- update to parsec >= 3.1.6 API (thanks alpako!)
+
+version 0.1.1
+	- no changelog (yet?)

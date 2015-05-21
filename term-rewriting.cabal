@@ -1,5 +1,5 @@
 name:          term-rewriting
-version:       0.1.2.2
+version:       0.2
 stability:     experimental
 author:        Martin Avanzini,
                Bertram Felgenhauer,
@@ -18,6 +18,9 @@ description:
   term rewriting.
 build-type:    Simple
 cabal-version: >= 1.8
+
+extra-source-files:
+    Changelog
 
 source-repository head
     type: git
