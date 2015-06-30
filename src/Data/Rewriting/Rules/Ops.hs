@@ -11,17 +11,21 @@ module Data.Rewriting.Rules.Ops (
     varsDL,
     lhss,
     rhss,
+    map,
     restrictFuns,
     -- * Predicates on Rules
     isLinear, isLeftLinear, isRightLinear,
     isGround, isLeftGround, isRightGround,
     isErasing,
     isCreating,
+    isExpanding,
     isDuplicating,
     isCollapsing,
     isValid,
 ) where
 
+import Prelude hiding (map)
+import qualified Prelude as P
 import Data.Rewriting.Rule (Rule)
 import Data.Rewriting.Term (Term)
 import qualified Data.Rewriting.Term as Term
@@ -30,11 +34,11 @@ import qualified Data.Rewriting.Rule as Rule
 
 -- | @lhss rs@ returns the list of left-hand sides of @rs@
 lhss :: [Rule f v] -> [Term f v]
-lhss = map Rule.lhs
+lhss = P.map Rule.lhs
 
 -- | @lhss rs@ returns the list of right-hand sides of @rs@
 rhss :: [Rule f v] -> [Term f v]
-rhss = map Rule.rhs
+rhss = P.map Rule.rhs
 
 -- | Lifting of Term.'Term.funs' to list of rules.
 funs :: [Rule f v] -> [f]
@@ -48,6 +52,10 @@ funsDL rs fs = foldr Rule.funsDL fs rs
 -- | Lifting of Term.'Term.vars' to list of rules.
 vars :: [Rule f v] -> [v]
 vars = flip varsDL []
+
+-- | Lifting of Rule.'Rule.map' to list of rules.
+map :: (f -> f') -> (v -> v') -> [Rule f v] -> [Rule f' v']
+map f v = P.map (Rule.map f v)
 
 -- | Difference List version of 'vars'.
 -- We have @varsDL r vs = vars r ++ vs@.
