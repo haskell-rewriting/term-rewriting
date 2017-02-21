@@ -1,5 +1,5 @@
 name:          term-rewriting
-version:       0.2
+version:       0.2.1
 stability:     experimental
 author:        Martin Avanzini,
                Bertram Felgenhauer,
@@ -65,7 +65,7 @@ library
         Data.Rewriting.Utils.Parse
     build-depends:
         containers >= 0.3 && < 0.6,
-        multiset >= 0.2 && < 0.3,
+        multiset >= 0.2 && < 0.4,
         parsec >= 3.1.6 && < 3.2,
         union-find-array >= 0.1 && < 0.2,
         array >= 0.3 && < 0.6,
