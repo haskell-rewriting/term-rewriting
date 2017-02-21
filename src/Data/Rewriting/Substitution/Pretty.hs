@@ -24,6 +24,3 @@ prettySubst fun var = prettyGSubst var fun var
 
 instance (Pretty v, Pretty f, Pretty v') => Pretty (GSubst v f v') where
     pretty = prettyGSubst pretty pretty pretty
-
-instance (Pretty f, Pretty v) => Pretty (Subst f v) where
-    pretty = prettySubst pretty pretty
