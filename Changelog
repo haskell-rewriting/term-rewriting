@@ -1,3 +1,10 @@
+version 0.2.1.1
+        - Changelog
+
+version 0.2.1
+        - add Term.mapSides, Rule.map, Rules.map, Problem.map
+        - fix build with ghc-8.0.2 (and remove overlapping instance)
+
 version 0.2
 	- fix argument order of Data.Rewriting.Rule.isVariantOf
 
