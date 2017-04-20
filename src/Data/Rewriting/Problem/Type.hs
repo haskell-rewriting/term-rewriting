@@ -19,6 +19,8 @@ import qualified Prelude as P
 import Data.Rewriting.Rule (Rule (..))
 import qualified Data.Rewriting.Rule as Rule
 
+import Control.Applicative
+
 data StartTerms = AllTerms
                 | BasicTerms deriving (Eq, Show)
 
