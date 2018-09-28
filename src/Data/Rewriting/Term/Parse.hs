@@ -16,7 +16,6 @@ module Data.Rewriting.Term.Parse (
 import Data.Rewriting.Utils.Parse (lex, par, ident)
 import Prelude hiding (lex)
 import Control.Monad
-import Control.Monad.Error ()
 import Data.Rewriting.Term.Type
 import Text.Parsec hiding (parse)
 import Text.Parsec.Prim (runP)
