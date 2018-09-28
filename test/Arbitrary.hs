@@ -21,7 +21,7 @@ import qualified Data.Rewriting.Rule as Rule
 import Data.Rewriting.Substitution (Subst, GSubst)
 import qualified Data.Rewriting.Substitution.Type as Subst
 
-import Test.QuickCheck
+import Test.QuickCheck (Arbitrary (..), CoArbitrary (..), (><))
 import Test.QuickCheck.Gen
 import Control.Applicative
 import Control.Monad
