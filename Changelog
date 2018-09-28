@@ -1,3 +1,9 @@
+version 0.3
+	- drop Control.Monad.Error import in Data.Rewriting.Term.Parse
+	- fix testsuite
+	  * include all modules in source distribution
+	  * build fix for recent QuickCheck
+
 version 0.2.1.1
         - Changelog
 
