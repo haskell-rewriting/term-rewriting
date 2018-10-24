@@ -70,11 +70,13 @@ solve ((t, u) : xs) = do
             solve xs
         _ | funari t' == funari u' -> do
             -- matching function applications: expand ...
-            FunA _ ts <- expand t t'
-            FunA _ us <- expand u u'
+            funt <- expand t t'
+            funu <- expand u u'
             UM.merge (\t _ -> (t, ())) t u
             -- ... and equate the argument lists.
-            solve (zip ts us ++ xs)
+            case (funt, funu) of
+                (FunA _ ts, FunA _ us) ->
+                    solve (zip ts us ++ xs)
         _ -> do
             -- mismatch, fail.
             return False
