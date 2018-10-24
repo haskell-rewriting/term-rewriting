@@ -26,13 +26,16 @@ prettyWST' = prettyWST pretty pretty
 prettyWST :: (f -> Doc) -> (v -> Doc) -> Problem f v -> Doc
 prettyWST fun var prob =
     printWhen (sterms /= AllTerms) (block "STARTTERM" $ text "CONSTRUCTOR-BASED")
-    <$$> printWhen (strat /= Full) (block "STRATEGY" $ ppStrat strat)
-    <$$> maybeblock "THEORY" theory ppTheories
-    <$$> block "VAR" (ppVars $ variables prob)
-    <$$> block "RULES" (ppRules $ rules prob)
-    <$$> maybeblock "COMMENT" comment text
+    <> printWhen (strat /= Full) (block "STRATEGY" $ ppStrat strat)
+    <> maybeblock "THEORY" theory ppTheories
+    <> block "VAR" (ppVars $ variables prob)
+    <> block "RULES" (ppRules $ rules prob)
+    <> commentblock comment text
 
-  where block n pp = parens $ hang 3 $ text n <$$> pp
+  where commentblock f fpp = case f prob of
+                               Just e -> parens $ fpp e
+                               Nothing -> empty
+        block n pp = (parens $ hang 3 $ text n <$$> pp) <> linebreak
         maybeblock n f fpp = case f prob of
                                Just e -> block n (fpp e)
                                Nothing -> empty
