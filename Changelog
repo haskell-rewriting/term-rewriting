@@ -1,3 +1,6 @@
+version 0.3.0.1
+	- compatibility with ghc-8.6.1
+
 version 0.3
 	- drop Control.Monad.Error import in Data.Rewriting.Term.Parse
 	- fix testsuite
