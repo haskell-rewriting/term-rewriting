@@ -68,11 +68,14 @@ solve ((t, u) : xs) = do
             -- assign term to variable
             UM.merge (\_ _ -> (t', ())) t u
             solve xs
-        _ | funari t' == funari u' -> do
+        _ | funari t' == funari u' ->
             -- matching function applications: expand ...
-            FunA _ ts <- expand t t'
-            FunA _ us <- expand u u'
-            UM.merge (\t _ -> (t, ())) t u
+            -- note: avoid `do` notation because `FunA _ ts` is a "failable"
+            -- pattern and `UnionM` doesn't have a `MonadFail` instance;
+            -- cf. https://wiki.haskell.org/MonadFail_Proposal
+            expand t t' >>= \(FunA _ ts) ->
+            expand u u' >>= \(FunA _ us) ->
+            UM.merge (\t _ -> (t, ())) t u >>
             -- ... and equate the argument lists.
             solve (zip ts us ++ xs)
         _ -> do
