@@ -39,6 +39,7 @@ data Problem f v = Problem { startTerms :: StartTerms
                            , rules      :: RulesPair f v
                            , variables  :: [v]
                            , symbols    :: [f]
+                           , signature  :: Maybe [(f,Int)]
                            , comment    :: Maybe String} deriving (Show)
 
 allRules :: RulesPair f v -> [Rule f v]
@@ -52,6 +53,7 @@ map ffun fvar prob =
            , rules = mapRulesPair ffun fvar (rules prob)
            , variables = P.map fvar (variables prob)
            , symbols = P.map ffun (symbols prob)
+           , signature = fmap (P.map (\(f,a) -> (ffun f, a))) (signature prob)
            , comment = comment prob}
               
 mapTheory :: (f -> f') -> (v -> v') -> Theory f v -> Theory f' v'
