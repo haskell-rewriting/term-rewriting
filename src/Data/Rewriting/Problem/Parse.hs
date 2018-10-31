@@ -93,6 +93,7 @@ parse = spaces >> parseDecls >> eof >> getState where
                                                         Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
            <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
            <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
+           <|> (decl "COMMENT"   comment   (\ e p -> p {Prob.comment = maybeAppend Prob.comment e p}) <?> "comment")
            <|> (par comment >>= modifyProblem . (\ e p -> p {Prob.comment = maybeAppend Prob.comment e p}) <?> "comment")
   decl name p f = try (par $ do
       lex $ string name

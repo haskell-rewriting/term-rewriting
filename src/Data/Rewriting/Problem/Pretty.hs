@@ -30,12 +30,9 @@ prettyWST fun var prob =
     <> maybeblock "THEORY" theory ppTheories
     <> block "VAR" (ppVars $ variables prob)
     <> block "RULES" (ppRules $ rules prob)
-    <> commentblock comment text
+    <> maybeblock "COMMENT" comment text
 
-  where commentblock f fpp = case f prob of
-                               Just e -> parens $ fpp e
-                               Nothing -> empty
-        block n pp = (parens $ (hang 3 $ text n <$$> pp) <> linebreak) <> linebreak
+  where block n pp = (parens $ (hang 3 $ text n <$$> pp) <> linebreak) <> linebreak
         maybeblock n f fpp = case f prob of
                                Just e -> block n (fpp e)
                                Nothing -> empty
