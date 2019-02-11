@@ -71,6 +71,7 @@ fromCharStream sourcename input =
                                                                          Prob.weakRules = [] } ,
                                       Prob.variables  = [] ,
                                       Prob.symbols    = [] ,
+                                      Prob.signature  = Nothing,
                                       Prob.comment    = Nothing }
 
 
@@ -89,10 +90,12 @@ parse = spaces >> parseDecls >> eof >> getState where
   parseDecls = many1 parseDecl
   parseDecl =  decl "VAR"       vars       (\ e p -> p {Prob.variables = e `union` Prob.variables p})
            <|> decl "THEORY"    theory     (\ e p -> p {Prob.theory = maybeAppend Prob.theory e p})
+           <|> decl "SIG"       signature  (\ e p -> p {Prob.signature = maybeAppend Prob.signature e p})
            <|> decl "RULES"     rules      (\ e p -> p {Prob.rules   = e, --FIXME multiple RULES blocks?
                                                         Prob.symbols = Rules.funsDL (Prob.allRules e) [] })
            <|> decl "STRATEGY"  strategy   (\ e p -> p {Prob.strategy = e})
            <|> decl "STARTTERM" startterms (\ e p -> p {Prob.startTerms = e})
+           <|> (decl "COMMENT"   comment   (\ e p -> p {Prob.comment = maybeAppend Prob.comment e p}) <?> "comment")
            <|> (par comment >>= modifyProblem . (\ e p -> p {Prob.comment = maybeAppend Prob.comment e p}) <?> "comment")
   decl name p f = try (par $ do
       lex $ string name
@@ -103,6 +106,14 @@ parse = spaces >> parseDecls >> eof >> getState where
 vars :: (Stream s (Either ProblemParseError) Char) => WSTParser s [String]
 vars = do vs <- many (lex $ ident "()," [])
           return vs
+
+signature :: (Stream s (Either ProblemParseError) Char) => WSTParser s [(String,Int)]
+signature = many fundecl
+    where
+        fundecl = par (do
+            f  <- lex $ ident "()," []
+            ar <- lex (read <$> many1 digit)
+            return $ (f,ar))
 
 theory :: (Stream s (Either ProblemParseError) Char) => WSTParser s [Prob.Theory String String]
 theory = many thdecl where

@@ -26,13 +26,14 @@ prettyWST' = prettyWST pretty pretty
 prettyWST :: (f -> Doc) -> (v -> Doc) -> Problem f v -> Doc
 prettyWST fun var prob =
     printWhen (sterms /= AllTerms) (block "STARTTERM" $ text "CONSTRUCTOR-BASED")
-    <$$> printWhen (strat /= Full) (block "STRATEGY" $ ppStrat strat)
-    <$$> maybeblock "THEORY" theory ppTheories
-    <$$> block "VAR" (ppVars $ variables prob)
-    <$$> block "RULES" (ppRules $ rules prob)
-    <$$> maybeblock "COMMENT" comment text
+    <> printWhen (strat /= Full) (block "STRATEGY" $ ppStrat strat)
+    <> maybeblock "THEORY" theory ppTheories
+    <> block "VAR" (ppVars $ variables prob)
+    <> maybeblock "SIG" signature ppSignature
+    <> block "RULES" (ppRules $ rules prob)
+    <> maybeblock "COMMENT" comment text
 
-  where block n pp = parens $ hang 3 $ text n <$$> pp
+  where block n pp = (parens $ (hang 3 $ text n <$$> pp) <> linebreak) <> linebreak
         maybeblock n f fpp = case f prob of
                                Just e -> block n (fpp e)
                                Nothing -> empty
@@ -45,6 +46,9 @@ prettyWST fun var prob =
         ppTheories thys = align $ vcat [ppThy thy | thy <- thys]
             where ppThy (SymbolProperty p fs) = block p (align $ fillSep [ fun f | f <- fs ])
                   ppThy (Equations rs)        = block "EQUATIONS" $ vcat [ppRule "==" r | r <- rs]
+
+        ppSignature sigs = align $ fillSep [ppSig sig | sig <- sigs]
+            where ppSig (f,i) = parens $ fun f <+> int i
 
         ppRules rp = align $ vcat ([ppRule "->" r | r <- strictRules rp]
                                    ++ [ppRule "->=" r | r <- weakRules rp])
