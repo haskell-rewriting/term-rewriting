@@ -93,4 +93,4 @@ test-suite test
         term-rewriting,
         containers >= 0.3 && < 0.7,
         HUnit >= 1.2 && < 1.7,
-        QuickCheck >= 2.6 && < 2.13
+        QuickCheck >= 2.6 && < 2.14
