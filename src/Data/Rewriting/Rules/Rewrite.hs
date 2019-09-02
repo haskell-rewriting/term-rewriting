@@ -17,6 +17,7 @@ module Data.Rewriting.Rules.Rewrite (
     outerRewrite,
     innerRewrite,
     rootRewrite,
+    normalForms,
     -- * utilities not reexported from "Data.Rewriting.Rules"
     nested,
     listContexts,
@@ -93,3 +94,10 @@ listContexts :: [a] -> [(Int, a -> [a], a)]
 listContexts = go 0 id where
     go !n f [] = []
     go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) (f . (x:)) xs
+
+-- | Compute normal forms: Apply a rewriting strategy until no further steps are
+-- possible, collecting all reducts that are themselves irreducible.
+normalForms :: Strategy f v v' -> Term f v -> [Term f v]
+normalForms s t = go [t] where
+    go ts = let rss = fmap s ts in
+       [t | (t, []) <- zip ts rss] ++ go (rss >>= fmap result)
