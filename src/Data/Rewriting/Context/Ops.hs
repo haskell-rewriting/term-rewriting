@@ -1,12 +1,14 @@
 -- This file is part of the 'term-rewriting' library. It is licensed
 -- under an MIT license. See the accompanying 'LICENSE' file for details.
 --
--- Authors: Christian Sternagel
+-- Authors: Christian Sternagel, Julian Parsert
 
 module Data.Rewriting.Context.Ops (
     apply,
     compose,
     ofTerm,
+    rotate,
+    ctxtExponent,
 ) where
 
 import Control.Monad
@@ -35,3 +37,15 @@ ofTerm (Fun f ts) (i:p) = do
     ctxt <- ofTerm t p
     return (Ctxt f ts1 ctxt ts2)
 ofTerm _ _ = Nothing
+
+rotate :: Ctxt f v -> Int -> Ctxt f v
+rotate c 0 = c
+rotate Hole n = Hole
+rotate (Ctxt f u d v) n = rotate (compose d (Ctxt f u Hole v)) (n-1)
+
+ctxtExponent :: Ctxt f v -> Int -> Ctxt f v
+ctxtExponent _ 0 = Hole
+ctxtExponent Hole n = Hole
+ctxtExponent (Ctxt f u d v) n = Ctxt f u (ctxtExponent rot (n-1)) v
+    where
+        rot = rotate (Ctxt f u d v) 1
