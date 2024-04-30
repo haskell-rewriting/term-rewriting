@@ -8,15 +8,16 @@ module Data.Rewriting.Term.Pretty (
 ) where
 
 import Data.Rewriting.Term.Type
-import Text.PrettyPrint.ANSI.Leijen
+--import Text.PrettyPrint.ANSI.Leijen
+import Prettyprinter
 
 -- | Given a pretty printer @f@ for function symbols and pretty printer @v@ for variables
 -- @prettyTerm f v@ produces a pretty printer for terms
 
-prettyTerm :: (f -> Doc) -> (v -> Doc) -> Term f v -> Doc
+prettyTerm :: (f -> Doc ann) -> (v -> Doc ann) -> Term f v -> Doc ann
 prettyTerm _         var (Var x) = var x
 prettyTerm fun var (Fun f ts)    = fun f <> args where
     args = encloseSep lparen rparen comma [prettyTerm fun var ti | ti <- ts]
 
 instance (Pretty f, Pretty v) => Pretty (Term f v) where
-    pretty = prettyTerm pretty pretty
+    pretty t = prettyTerm pretty pretty t

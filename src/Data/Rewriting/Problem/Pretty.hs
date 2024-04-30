@@ -13,17 +13,25 @@ import Data.Maybe (isJust, fromJust)
 import Data.List (nub)
 import Data.Rewriting.Problem.Type
 import Data.Rewriting.Rule (prettyRule)
-import Text.PrettyPrint.ANSI.Leijen
+-- import Text.PrettyPrint.ANSI.Leijen
+import Prettyprinter
 
-printWhen :: Bool -> Doc -> Doc
-printWhen False _ = empty
+printWhen :: Bool -> Doc ann -> Doc ann
+printWhen False _ = pretty ""
 printWhen True  p = p
 
+text = pretty
+empty = text ""
+linebreak = flatAlt line empty
+int = text . show
+underline =  id
 
-prettyWST' :: (Pretty f, Pretty v) => Problem f v -> Doc
+x <$$> y = x <> linebreak <> y
+
+prettyWST' :: (Pretty f, Pretty v) => Problem f v -> Doc ann
 prettyWST' = prettyWST pretty pretty
 
-prettyWST :: (f -> Doc) -> (v -> Doc) -> Problem f v -> Doc
+prettyWST :: (f -> Doc ann) -> (v -> Doc ann) -> Problem f v -> Doc ann
 prettyWST fun var prob =
     printWhen (sterms /= AllTerms) (block "STARTTERM" $ text "CONSTRUCTOR-BASED")
     <> printWhen (strat /= Full) (block "STRATEGY" $ ppStrat strat)
@@ -33,7 +41,7 @@ prettyWST fun var prob =
     <> block "RULES" (ppRules $ rules prob)
     <> maybeblock "COMMENT" comment text
 
-  where block n pp = (parens $ (hang 3 $ text n <$$> pp) <> linebreak) <> linebreak
+  where block n pp = (parens $ (hang 3 $ text n <> linebreak <> pp) <> linebreak) <> linebreak
         maybeblock n f fpp = case f prob of
                                Just e -> block n (fpp e)
                                Nothing -> empty
@@ -60,7 +68,7 @@ prettyWST fun var prob =
         thry   = theory prob
 
 
-prettyProblem :: (Eq f, Eq v) => (f -> Doc) -> (v -> Doc) -> Problem f v -> Doc
+prettyProblem :: (Eq f, Eq v) => (f -> Doc ann) -> (v -> Doc ann) -> Problem f v -> Doc ann
 prettyProblem fun var prob =  block "Start-Terms" (ppST `on` startTerms)
                               <$$> block "Strategy" (ppStrat `on` strategy)
                               <$$> block "Variables" (ppVars `on` variables)

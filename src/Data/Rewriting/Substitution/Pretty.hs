@@ -12,14 +12,15 @@ import Data.Rewriting.Substitution.Type
 import Data.Rewriting.Term (prettyTerm)
 import qualified Data.Map as M
 
-import Text.PrettyPrint.ANSI.Leijen
+-- import Text.PrettyPrint.ANSI.Leijen (text)
+import Prettyprinter
 
-prettyGSubst :: (v -> Doc) -> (f -> Doc) -> (v' -> Doc) -> GSubst v f v' -> Doc
+prettyGSubst :: (v -> Doc ann) -> (f -> Doc ann) -> (v' -> Doc ann) -> GSubst v f v' -> Doc ann
 prettyGSubst var fun var' subst =
     encloseSep lbrace rbrace comma [ppBinding v t | (v,t) <- M.toList $ toMap subst]
-    where ppBinding v t = var v <> text "/" <> prettyTerm fun var' t
+    where ppBinding v t = var v <> pretty "/" <> prettyTerm fun var' t
 
-prettySubst :: (f -> Doc) -> (v -> Doc) -> Subst f v -> Doc
+prettySubst :: (f -> Doc ann) -> (v -> Doc ann) -> Subst f v -> Doc ann
 prettySubst fun var = prettyGSubst var fun var
 
 instance (Pretty v, Pretty f, Pretty v') => Pretty (GSubst v f v') where
