@@ -21,6 +21,7 @@ import qualified Control.Monad.Union as UM
 import qualified Data.Union as U
 import Control.Monad.State
 import Control.Monad.ST
+import Control.Monad
 import Control.Applicative
 import Control.Arrow
 import Data.Array.ST
