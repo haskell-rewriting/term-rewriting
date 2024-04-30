@@ -5,6 +5,7 @@
 
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds #-}
 module Data.Rewriting.Problem.Parse (
   parseIO,
   parseFileIO,
@@ -25,8 +26,8 @@ import Data.List (partition, union)
 import Data.Maybe (isJust)
 import Prelude hiding (lex, catch)
 import Control.Exception (catch)
-import Control.Monad.Error
-import Control.Monad (liftM, liftM3)
+import Control.Monad.Except
+import Control.Monad (liftM, liftM2, liftM3, mzero)
 import Text.Parsec hiding (parse)
 import System.IO (readFile)
 
@@ -36,7 +37,7 @@ data ProblemParseError = UnknownParseError String
                        | UnsupportedDeclaration String
                        | SomeParseError ParseError deriving (Show)
 
-instance Error ProblemParseError where strMsg = UnknownParseError
+-- instance Error ProblemParseError where strMsg = UnknownParseError
 
 parseFileIO :: FilePath -> IO (Problem String String)
 parseFileIO file = do r <- fromFile file
