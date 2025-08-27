@@ -1,5 +1,5 @@
 name:          term-rewriting
-version:       0.4.0.2
+version:       0.5
 stability:     experimental
 author:        Martin Avanzini,
                Bertram Felgenhauer,
@@ -24,7 +24,7 @@ extra-source-files:
 
 source-repository head
     type: git
-    location: git://github.com/haskell-rewriting/term-rewriting
+    location: https://github.com/haskell-rewriting/term-rewriting
 
 library
     hs-source-dirs:
@@ -64,13 +64,13 @@ library
         Data.Rewriting.Utils
         Data.Rewriting.Utils.Parse
     build-depends:
-        containers >= 0.3 && < 0.7,
+        containers >= 0.3 && < 0.9,
         multiset >= 0.2 && < 0.4,
         parsec >= 3.1.6 && < 3.2,
         union-find-array >= 0.1 && < 0.2,
         array >= 0.3 && < 0.6,
         ansi-wl-pprint >= 0.6 && < 0.7,
-        mtl >= 1.1 && < 2.3,
+        mtl >= 1.1 && < 2.4,
         base >= 4 && < 5
     extensions:
         TypeSynonymInstances
@@ -91,6 +91,6 @@ test-suite test
     build-depends:
         base >= 4 && < 5,
         term-rewriting,
-        containers >= 0.3 && < 0.7,
+        containers >= 0.3 && < 0.9,
         HUnit >= 1.2 && < 1.7,
-        QuickCheck >= 2.6 && < 2.14
+        QuickCheck >= 2.6 && < 2.17

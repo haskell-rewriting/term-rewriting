@@ -1,3 +1,7 @@
+version 0.5
+	- compatibility with ghc-9.12.1 (bump dependency bounds)
+	- drop `Error ProblemParseError` instance for mtl-2.3 compatibility
+
 version 0.4.0.2
 	- compatibility with ghc-8.8.1 (bump quickcheck version)
 
